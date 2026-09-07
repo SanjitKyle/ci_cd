@@ -1,4 +1,4 @@
-name: week 1 Triggers & Filtters 
+name:  Automated Quality Gate 
 
 on:
  # Trigger on push  , but only on main branch 
@@ -15,11 +15,17 @@ on:
   workflow_dispatch:
 
 jobs:
-  test_trigger:
+  run-tests:
     runs-on: ubuntu-latest
     steps:
-     - name: 1. checkout code 
+     - name: 1. checkout repository 
        uses: actions/checkout@v4
-     - name: 2. print success message
-       run: |
-         echo "Hello its is working sucessfully "
+     - name: 2. setup nodejs 
+       uses: actions/setup-node@v3
+       with:
+         node-version: 20
+     - name : 3. Install package
+       run : npm ci
+     - name : 4. Execute test script 
+       run : npm test 
+
