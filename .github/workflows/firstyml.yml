@@ -1,25 +1,14 @@
-name: My First Workflow
-
+name: Myworkflow
 on:
   push:
-  workflow_dispatch:   # <--- Adds a manual "Run workflow" button in GitHub!
-
+   workflow_dispatch:
 jobs:
-  hello:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Show files
-        run: ls -la
-
-      - name: Check Node
-        run: node --version
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Test run application syntax
-        run: node -e "console.log('App check successful!')"
+ check-my-cde:
+   runs-on: ubbuntu-latest
+   steps:
+    - name: 1. Download my code 
+      uses: actions/checkout@v3
+    - name: 2. Check node version
+      run: node -v
+    - name : 3. Print my success message
+      run : echo "My workflow is sucessfully running "
