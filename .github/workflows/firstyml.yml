@@ -1,4 +1,4 @@
-name:  Automated Quality Gate 
+name: secret key test and security 
 
 on:
  # Trigger on push  , but only on main branch 
@@ -15,17 +15,28 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-tests:
+  test-and-verify-secrets:
     runs-on: ubuntu-latest
+
     steps:
-     - name: 1. checkout repository 
+     - name: 1. checkout code
        uses: actions/checkout@v4
+
      - name: 2. setup nodejs 
-       uses: actions/setup-node@v3
+       uses: actions/setup-node@v4
+
        with:
          node-version: 20
+
      - name : 3. Install package
        run : npm ci
+
      - name : 4. Execute test script 
        run : npm test 
+     - name : 5. use secret key 
+       env : 
+         MY_API_KEY: ${{secrets.MY_API_KEY}}
+       run : |
+
+         echo "Using secret key in workflow "
 
