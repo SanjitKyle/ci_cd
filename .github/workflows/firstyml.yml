@@ -1,14 +1,19 @@
-name: Myworkflow
+name: My First Workflow
+
 on:
   push:
-   workflow_dispatch:
+  workflow_dispatch:
+
 jobs:
- check-my-cde:
-   runs-on: ubbuntu-latest
-   steps:
-    - name: 1. Download my code 
-      uses: actions/checkout@v3
-    - name: 2. Check node version
-      run: node -v
-    - name : 3. Print my success message
-      run : echo "My workflow is sucessfully running "
+  check-my-code:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Download my code
+        uses: actions/checkout@v4
+
+      - name: 2. Check Node version
+        run: node -v
+
+      - name: 3. Print a success message
+        run: echo "Hello! My CI pipeline ran successfully!"
