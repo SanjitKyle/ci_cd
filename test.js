@@ -1,6 +1,6 @@
 // test.js - Simple math test
 function add(a, b) {
-  return a + b;
+  return a +2+ b;
 }
 
 console.log("Running automated unit test...");
