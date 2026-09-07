@@ -1,19 +1,25 @@
-name: My First Workflow
+name: week 1 Triggers & Filtters 
 
 on:
+ # Trigger on push  , but only on main branch 
   push:
+    branches:
+      - main 
+    path-ignore:
+      - "README.md"
+  pull_request:
+    branches:
+      - main 
+    
+  # Trigger manual trigger from github action tab 
   workflow_dispatch:
 
 jobs:
-  check-my-code:
+  test_trigger:
     runs-on: ubuntu-latest
-
     steps:
-      - name: 1. Download my code
-        uses: actions/checkout@v4
-
-      - name: 2. Check Node version
-        run: node -v
-
-      - name: 3. Print a success message
-        run: echo "Hello! My CI pipeline ran successfully!"
+     - name: 1. checkout code 
+       uses: actions/checkout@v4
+     - name: 2. print success message
+       run: |
+         echo "Hello its is working sucessfully "
