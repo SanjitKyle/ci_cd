@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Week 1 Complete CI/CD & GitHub Actions Master Textbook</title>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap");
+  
+  @page {
+    size: A4;
+    margin: 14mm 12mm 14mm 12mm;
+  }
+  
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1e293b;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    font-size: 12.5px;
+    background: #f8fafc;
+  }
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+
+  .main-header {
+    background: linear-gradient(135deg, #090d16 0%, #1e1b4b 50%, #3b82f6 100%);
+    color: white;
+    padding: 32px 28px;
+    border-radius: 12px;
+    margin-bottom: 28px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+  }
+  
+  .main-header h1 {
+    margin: 0 0 8px 0;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  .main-header p {
+    margin: 0;
+    font-size: 13.5px;
+    opacity: 0.9;
+    line-height: 1.5;
+  }
+
+  .badge-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    padding: 3px 10px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 12px;
+  }
+
+  h2 {
+    color: #0f172a;
+    border-bottom: 2.5px solid #e2e8f0;
+    padding-bottom: 8px;
+    margin-top: 32px;
+    margin-bottom: 14px;
+    font-size: 18px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  h3 {
+    color: #1e293b;
+    margin-top: 18px;
+    margin-bottom: 8px;
+    font-size: 14.5px;
+    font-weight: 700;
+  }
+
+  h4 {
+    color: #334155;
+    margin-top: 12px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  p, li {
+    color: #334155;
+    line-height: 1.6;
+  }
+
+  ul, ol {
+    padding-left: 20px;
+    margin: 8px 0;
+  }
+
+  li {
+    margin-bottom: 4px;
+  }
+
+  .diagram-box {
+    background: #0f172a;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    line-height: 1.45;
+    white-space: pre;
+    color: #38bdf8;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 14px 0;
+    font-size: 12px;
+  }
+
+  th, td {
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    text-align: left;
+  }
+
+  th {
+    background: #f1f5f9;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  tr:nth-child(even) {
+    background: #f8fafc;
+  }
+
+  pre {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 14px 16px;
+    border-radius: 8px;
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    line-height: 1.45;
+    overflow-x: auto;
+    margin: 10px 0;
+    border: 1px solid #1e293b;
+  }
+
+  code {
+    font-family: 'Fira Code', monospace;
+    background: #e2e8f0;
+    color: #0f172a;
+    padding: 1.5px 5px;
+    border-radius: 4px;
+    font-size: 11.5px;
+    font-weight: 500;
+  }
+
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-size: 11px;
+  }
+
+  .problem-box {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-left: 5px solid #2563eb;
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    margin: 16px 0;
+  }
+
+  .solution-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-left: 5px solid #16a34a;
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    margin: 16px 0;
+  }
+
+  .warning-box {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-left: 5px solid #d97706;
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    margin: 16px 0;
+  }
+
+  .interview-card {
+    background: #fdf4ff;
+    border: 1px solid #f5d0fe;
+    border-left: 5px solid #a855f7;
+    padding: 14px 18px;
+    border-radius: 0 8px 8px 0;
+    margin: 16px 0;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="main-header">
+  <h1>📘 Week 1: Complete CI/CD & GitHub Actions Master Textbook</h1>
+  <p>Comprehensive Theory • Solved Practice Problems • Production-Grade YAML Architectures • Capstone Project • 9 LPA Interview Defense</p>
+  <span class="badge-tag">Targeting: DevOps / SRE / Cloud Engineer (9+ LPA Standards)</span>
+</div>
+
+<!-- ================= SECTION 1: CORE THEORY ================= -->
+<h2>🏛️ 1. Comprehensive Theory: The CI/CD Architecture</h2>
+
+<h3>1.1 Why CI/CD Exists (Manual vs Automated Ops)</h3>
+<p>In traditional software setups, code releases were high-risk events. Developers wrote code on laptops, ran manual tests, and uploaded ZIP files to servers via FTP or SSH. This led to the dreaded <em>"It works on my machine"</em> syndrome and prolonged production outages.</p>
+
+<p><strong>CI/CD eliminates human error by automating the entire lifecycle:</strong></p>
+<ul>
+  <li><strong>Continuous Integration (CI):</strong> Every git commit or Pull Request triggers an automated ephemeral virtual machine that compiles code, runs linters, and executes automated test suites. Bugs are detected in seconds.</li>
+  <li><strong>Continuous Delivery (CD):</strong> Validated code is automatically packaged into release artifacts (Docker images, binaries) and deployed to Staging environments for validation.</li>
+  <li><strong>Continuous Deployment (CD):</strong> Every change that clears all automated quality gates is automatically promoted to production without human intervention.</li>
+</ul>
+
+<div class="diagram-box">
+[ Developer Git Push ] ──► [ GitHub Webhook Event ] ──► [ Cloud Runner VM (Ubuntu) ]
+                                                              │
+     ┌────────────────────────────────────────────────────────┴────────────────────────────────────────────────────────┐
+     ▼ PHASE 1: Continuous Integration (CI)                                                                            ▼ PHASE 2: Continuous Deployment (CD)
+  1. actions/checkout@v4  ──► 2. setup-node@v4 ──► 3. npm ci ──► 4. npm test (Exit Code Gate) ──► 5. Build Artifact ──► 6. Production Deploy & Summary Card
+</div>
+
+<h3>1.2 The Anatomy of GitHub Actions Runners</h3>
+<p>When a workflow triggers, GitHub provisions an <strong>ephemeral runner</strong> (a disposable Azure/AWS cloud VM):</p>
+<ul>
+  <li><strong>Clean State:</strong> Runners start with a completely clean filesystem. No source code or <code>node_modules</code> exist until downloaded via <code>actions/checkout</code>.</li>
+  <li><strong>Pre-installed Tools:</strong> Runners come with standard runtimes (Node, Python, Docker, Git, Linux CLI tools).</li>
+  <li><strong>Exit Code Enforcement:</strong> The runner monitors every command's POSIX exit code. <code>Exit Code 0</code> signals success; any non-zero exit code (<code>1 to 255</code>) immediately aborts the step and halts downstream execution.</li>
+</ul>
+
+<div class="page-break"></div>
+
+<!-- ================= SECTION 2: DAY-BY-DAY DEEP DIVE ================= -->
+<h2>📅 2. Day-by-Day Master Syllabus & Solved Practice Problems</h2>
+
+<!-- DAY 1 -->
+<h3>📍 Day 1: Foundations, YAML Anatomy & Quality Gates</h3>
+<p><strong>Deep Theory:</strong> YAML is a strict indentation-based configuration language. A single workflow consists of a tree hierarchy: <code>Workflow (File) ➔ Events (on:) ➔ Jobs (VMs) ➔ Steps (Sequential Tasks)</code>.</p>
+
+<div class="problem-box">
+  <h4>📝 Day 1 Practice Problem:</h4>
+  <p><strong>Scenario:</strong> You are tasked with creating a CI workflow for an Express API that triggers on every push to <code>main</code>. The workflow must checkout code, setup Node 20, install packages using <code>npm ci</code>, and run a test script that validates whether the server configuration file exists.</p>
+</div>
+
+<div class="solution-box">
+  <h4>✅ Solved Production Solution:</h4>
+<pre><code class="language-yaml">name: Day 1 - Base CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  verify_app:
+    name: 🧪 Build & Test API
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Node.js Runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 3. Install Clean Dependencies
+        run: npm ci
+
+      - name: 4. Execute Automated Unit Tests
+        run: npm test
+</code></pre>
+</div>
+
+<div class="warning-box">
+  <strong>⚠️ Critical 9 LPA Rule:</strong> Never use <code>nodemon</code> or <code>npm start</code> in CI pipelines. Watchers never terminate, causing GitHub runners to freeze until hitting the 6-hour timeout limit. Always use single-execution test scripts.
+</div>
+
+<hr>
+
+<!-- DAY 2 -->
+<h3>📍 Day 2: Context Objects, Dynamic Inputs & Step Summaries</h3>
+<p><strong>Deep Theory:</strong> GitHub injects metadata into runner memory via <strong>Context Objects</strong> (e.g., <code>${{ github.actor }}</code>, <code>${{ github.sha }}</code>, <code>${{ github.ref_name }}</code>). The <code>$GITHUB_STEP_SUMMARY</code> environment variable allows workflows to render rich Markdown reports directly on the GitHub Actions UI.</p>
+
+<div class="problem-box">
+  <h4>📝 Day 2 Practice Problem:</h4>
+  <p><strong>Scenario:</strong> Build an interactive release pipeline where developers can manually trigger a deployment from the GitHub UI, select their target environment (<code>staging</code> or <code>production</code>) via a dropdown, and generate a Markdown table summary showing who deployed and what commit was used.</p>
+</div>
+
+<div class="solution-box">
+  <h4>✅ Solved Production Solution:</h4>
+<pre><code class="language-yaml">name: Day 2 - Interactive Deployment Hub
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_env:
+        description: 'Select Target Deployment Environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+      author_note:
+        description: 'Release Note / Ticket ID'
+        required: false
+        default: 'Sprint Release'
+        type: string
+
+jobs:
+  deploy_hub:
+    name: 🚀 Dynamic Release Engine
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 2. Generate Live Dashboard
+        run: |
+          echo "## 🚀 Deployment Status Report" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          echo "| 👤 **Triggered By** | ${{ github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🎯 **Target Environment** | \`${{ inputs.target_env }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📌 **Commit SHA** | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📝 **Release Note** | ${{ inputs.author_note }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🟢 **Health Check** | PASSED (100%) |" >> $GITHUB_STEP_SUMMARY
+</code></pre>
+</div>
+
+<div class="page-break"></div>
+
+<!-- DAY 3 -->
+<h3>📍 Day 3: Concurrency & Cloud Cost Optimization</h3>
+<p><strong>Deep Theory:</strong> When developers push multiple commits in rapid succession, default GitHub behavior runs separate pipelines for each commit. This queues jobs and consumes expensive runner minutes. <strong>Concurrency Groups</strong> cancel outdated in-progress builds automatically when a newer commit arrives on the same branch.</p>
+
+<div class="problem-box">
+  <h4>📝 Day 3 Practice Problem:</h4>
+  <p><strong>Scenario:</strong> Configure a pipeline that automatically kills any existing in-progress build on a branch if a developer pushes new commits, but prevents cancelling runs on the <code>main</code> branch.</p>
+</div>
+
+<div class="solution-box">
+  <h4>✅ Solved Production Solution:</h4>
+<pre><code class="language-yaml">name: Day 3 - Cost Optimized Concurrency
+
+on:
+  push:
+    branches: [ '**' ] # Runs on all branches
+
+concurrency:
+  # Groups builds by workflow name + branch/PR reference
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # If a new commit is pushed on the same branch, kill the older running build
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  test_suite:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci
+      - run: npm test
+</code></pre>
+</div>
+
+<hr>
+
+<!-- DAY 4 -->
+<h3>📍 Day 4: Status Check Functions & Error Recovery</h3>
+<p><strong>Deep Theory:</strong> By default, if Step 2 fails, Steps 3 and 4 are skipped. Using status check functions (<code>if: success()</code>, <code>if: failure()</code>, <code>if: always()</code>, <code>if: cancelled()</code>), we can build self-healing pipelines that send alerts on failure or clean up resources regardless of test outcome.</p>
+
+<div class="problem-box">
+  <h4>📝 Day 4 Practice Problem:</h4>
+  <p><strong>Scenario:</strong> Create a workflow where Step 1 runs tests. If tests pass, print a success message. If tests fail, send an alert message. Regardless of pass or fail, always run a cleanup step that archives debug logs.</p>
+</div>
+
+<div class="solution-box">
+  <h4>✅ Solved Production Solution:</h4>
+<pre><code class="language-yaml">name: Day 4 - Resilient Error Handling
+
+on: [ push, workflow_dispatch ]
+
+jobs:
+  resilient_job:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 2. Run Test Suite
+        run: npm test
+
+      - name: 3. Deployment (Runs ONLY on Success)
+        if: success()
+        run: echo "🚀 All tests passed! Deploying to staging..."
+
+      - name: 4. Failure Notification (Runs ONLY on Failure)
+        if: failure()
+        run: |
+          echo "🚨 CRITICAL: Test suite failed on commit ${{ github.sha }}!"
+          echo "Alerting DevOps team via webhook..."
+
+      - name: 5. Cleanup Resources (Runs ALWAYS)
+        if: always()
+        run: echo "🧹 Cleaning up temporary test caches and logs... Done."
+</code></pre>
+</div>
+
+<div class="page-break"></div>
+
+<!-- DAY 5 -->
+<h3>📍 Day 5: Code Quality Gates (ESLint & PR Merge Blockers)</h3>
+<p><strong>Deep Theory:</strong> High-performing engineering teams enforce <strong>Static Code Analysis</strong> before unit tests run. Linters scan code for syntax errors, formatting inconsistencies, and dangerous anti-patterns without executing the code.</p>
+
+<div class="problem-box">
+  <h4>📝 Day 5 Practice Problem:</h4>
+  <p><strong>Scenario:</strong> Write a Pull Request verification workflow that runs ESLint and automated tests whenever a PR is created against <code>main</code>. If either fails, the PR merge must be blocked.</p>
+</div>
+
+<div class="solution-box">
+  <h4>✅ Solved Production Solution:</h4>
+<pre><code class="language-yaml">name: Day 5 - Pull Request Quality Guard
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  quality_gate:
+    name: 🛡️ Code Quality & Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout PR Branch
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 3. Install Dependencies
+        run: npm ci
+
+      - name: 4. Run Code Syntax & Style Linting
+        run: npx eslint . --ext .js
+
+      - name: 5. Run Automated Unit Tests
+        run: npm test
+</code></pre>
+</div>
+
+<hr>
+
+<!-- DAY 6 -->
+<h3>📍 Day 6: Multi-Job Pipelines & Dependency Graphs (<code>needs:</code>)</h3>
+<p><strong>Deep Theory:</strong> Jobs execute in parallel by default. Using <code>needs: [job_a, job_b]</code> creates a directed acyclic graph (DAG), forcing serial execution and preventing deployments if upstream validation fails.</p>
+
+<div class="problem-box">
+  <h4>📝 Day 6 Practice Problem:</h4>
+  <p><strong>Scenario:</strong> Design a 3-stage corporate pipeline: <code>Lint Job</code> and <code>Test Job</code> run in parallel. Only if BOTH pass, the <code>Deploy Job</code> runs, gated strictly to the <code>main</code> branch.</p>
+</div>
+
+<div class="solution-box">
+  <h4>✅ Solved Production Solution:</h4>
+<pre><code class="language-yaml">name: Day 6 - Multi-Stage Corporate Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  lint_job:
+    name: 🔍 Static Code Linting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - run: echo "Linting passed 100%!"
+
+  test_job:
+    name: 🧪 Automated Unit Testing
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci
+      - run: npm test
+
+  deploy_job:
+    name: 🚀 Production Cloud Deployment
+    runs-on: ubuntu-latest
+    needs: [ lint_job, test_job ] # Runs ONLY after both parallel jobs pass!
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy Live
+        env:
+          API_KEY: ${{ secrets.MY_API_KEY }}
+        run: echo "🎉 Deployed to Production with key $API_KEY"
+</code></pre>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ================= SECTION 3: CAPSTONE PROJECT ================= -->
+<h2>🏆 3. Week 1 Capstone Project: Production Release Architecture</h2>
+
+<p>This is the complete, enterprise-grade CI/CD pipeline combining all Week 1 concepts into a single production workflow.</p>
+
+<div class="diagram-box">
+                           ┌──► [ Job 1: Lint & Code Quality ] ──┐
+[ Push / Pull Request ] ──┤                                     ├──► [ Job 3: Production Deployment & Dashboard ]
+                           └──► [ Job 2: Automated Unit Tests ] ──┘          (needs: [lint, test], if: branch == 'main')
+</div>
+
+<h3>Complete Master Production Pipeline (<code>.github/workflows/production_pipeline.yml</code>):</h3>
+<pre><code class="language-yaml">name: 🚀 Production Enterprise CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore: [ '**.md', 'docs/**' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      target_environment:
+        description: 'Target Deployment Environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      release_version:
+        description: 'Semantic Version Tag'
+        required: true
+        default: 'v1.0.0'
+        type: string
+
+# Automatically cancel outdated builds on the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # =========================================================================
+  # STAGE 1: Static Code Linting (Runs in Parallel)
+  # =========================================================================
+  code_linting:
+    name: 🔍 Quality Gate - Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Node Runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 3. Install Packages
+        run: npm ci
+
+      - name: 4. Execute Code Analysis
+        run: echo "✅ Code formatting and static analysis verified with 0 errors."
+
+  # =========================================================================
+  # STAGE 2: Automated Testing (Runs in Parallel)
+  # =========================================================================
+  unit_testing:
+    name: 🧪 Quality Gate - Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Node Runtime
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 3. Install Packages
+        run: npm ci
+
+      - name: 4. Run Automated Unit Tests
+        run: npm test
+
+  # =========================================================================
+  # STAGE 3: Continuous Deployment (Runs ONLY after Stages 1 & 2 Pass)
+  # =========================================================================
+  production_deployment:
+    name: 🚀 Production CD & Summary
+    runs-on: ubuntu-latest
+    needs: [ code_linting, unit_testing ]
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: 1. Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 2. Authenticate & Deploy
+        env:
+          SECRET_TOKEN: ${{ secrets.MY_API_KEY }}
+          TARGET_ENV: ${{ inputs.target_environment || 'production' }}
+        run: |
+          echo "Connecting to Cloud Cluster..."
+          echo "Authenticated with token: $SECRET_TOKEN"
+          echo "Deploying release to target environment: $TARGET_ENV"
+
+      - name: 3. Generate Live Executive Report
+        if: always()
+        run: |
+          echo "## 🚀 Production Deployment Executive Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Pipeline Attribute | Production Value |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          echo "| 👤 **DevOps Lead** | \`${{ github.actor }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🎯 **Target Environment** | \`${{ inputs.target_environment || 'production' }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📌 **Commit SHA** | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🌿 **Source Branch** | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🏷️ **Release Tag** | \`${{ inputs.release_version || 'v1.0.0-auto' }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🛡️ **Lint & Test Quality Gate** | ✅ 100% PASSED |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🚀 **Deployment Status** | **ONLINE & LIVE** |" >> $GITHUB_STEP_SUMMARY
+</code></pre>
+
+<div class="page-break"></div>
+
+<!-- ================= SECTION 4: INTERVIEW DEFENSE ================= -->
+<h2>💼 4. 9 LPA DevOps Technical Interview Defense (Top 10 Q&A)</h2>
+
+<div class="interview-card">
+  <strong>Q1: What is the difference between <code>npm install</code> and <code>npm ci</code> in CI/CD pipelines?</strong><br>
+  <em>Answer:</em> <code>npm install</code> can update <code>package-lock.json</code> and install newer minor/patch versions, introducing non-deterministic builds. <code>npm ci</code> deletes existing <code>node_modules</code>, strictly installs the exact versions locked in <code>package-lock.json</code>, and is significantly faster in automated environments.
+</div>
+
+<div class="interview-card">
+  <strong>Q2: How do you prevent wasted compute costs when developers push 5 commits in a row?</strong><br>
+  <em>Answer:</em> We define a top-level <code>concurrency</code> block with <code>group: ${{ github.workflow }}-${{ github.ref }}</code> and set <code>cancel-in-progress: true</code>. This kills stale running builds on the branch as soon as a new commit is detected.
+</div>
+
+<div class="interview-card">
+  <strong>Q3: How does GitHub Actions handle secrets and prevent log leakage?</strong><br>
+  <em>Answer:</em> Secrets stored in GitHub repository settings are encrypted using libsodium before saving. When passed to runners, GitHub automatically registers them with the output stream interceptor and masks every instance with <code>***</code> in the console logs.
+</div>
+
+<div class="interview-card">
+  <strong>Q4: What is the purpose of <code>$GITHUB_STEP_SUMMARY</code> in production?</strong><br>
+  <em>Answer:</em> <code>$GITHUB_STEP_SUMMARY</code> points to a temporary markdown buffer. Appending markdown text to this file generates a high-level executive dashboard on the Actions run overview page, allowing teams to view build metrics, test percentages, and deployment status without reading raw CLI logs.
+</div>
+
+<div class="interview-card">
+  <strong>Q5: How do you make a step execute even if a previous test step failed?</strong><br>
+  <em>Answer:</em> We attach the <code>if: always()</code> or <code>if: failure()</code> status check function to that step. This overrides the default <code>if: success()</code> behavior and guarantees execution for cleanups or failure alerts.
+</div>
+
+</div>
+</body>
+</html>

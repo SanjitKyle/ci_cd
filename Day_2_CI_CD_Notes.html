@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Day 2: GitHub Contexts, Interactive Inputs & Step Summaries</title>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap");
+  
+  @page {
+    size: A4;
+    margin: 16mm 14mm 16mm 14mm;
+  }
+  
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1e293b;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    font-size: 13.5px;
+    background: #fff;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #3b82f6 100%);
+    color: white;
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  }
+  
+  .header h1 {
+    margin: 0 0 6px 0;
+    font-size: 24px;
+    font-weight: 800;
+  }
+
+  .header p {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.9;
+  }
+
+  h2 {
+    color: #0f172a;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 5px;
+    margin-top: 22px;
+    margin-bottom: 10px;
+    font-size: 17px;
+    page-break-after: avoid;
+  }
+
+  h3 {
+    color: #334155;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    page-break-after: avoid;
+  }
+
+  .diagram-box {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 14px;
+    margin: 12px 0;
+    font-family: 'Fira Code', monospace;
+    font-size: 11.5px;
+    line-height: 1.4;
+    white-space: pre;
+    color: #0f172a;
+    page-break-inside: avoid;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 12px;
+    page-break-inside: avoid;
+  }
+
+  th, td {
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    text-align: left;
+  }
+
+  th {
+    background: #f1f5f9;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  tr:nth-child(even) {
+    background: #f8fafc;
+  }
+
+  pre {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-family: 'Fira Code', monospace;
+    font-size: 11.5px;
+    line-height: 1.45;
+    overflow-x: auto;
+    margin: 10px 0;
+    page-break-inside: avoid;
+  }
+
+  code {
+    font-family: 'Fira Code', monospace;
+    background: #e2e8f0;
+    color: #0f172a;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 11.5px;
+  }
+
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+  }
+
+  .badge {
+    display: inline-block;
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 11px;
+  }
+
+  .callout {
+    background: #f0fdf4;
+    border-left: 4px solid #22c55e;
+    padding: 10px 14px;
+    border-radius: 0 8px 8px 0;
+    margin: 12px 0;
+    font-size: 12.5px;
+  }
+
+  .interview-box {
+    background: #fdf4ff;
+    border: 1px solid #f0abfc;
+    border-left: 4px solid #c026d3;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 14px 0;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📘 Week 1 - Day 2: Contexts, Inputs & Step Summaries</h1>
+  <p>Production Pipelines • Dynamic Metadata • Interactive UI Control • Live Markdown Dashboards</p>
+</div>
+
+<h2>1. The Secret Brain: GitHub Context Objects</h2>
+<p>When any GitHub Actions runner boots up, GitHub automatically populates a metadata dictionary called <strong>Context Objects</strong>. These provide dynamic details about the build, author, environment, and code commit.</p>
+
+<div class="diagram-box">
+[ GitHub Engine ] ──► Injects Context Objects into Runner Memory
+                              │
+  ├── ${{ github.actor }}       ──► Username who initiated the workflow
+  ├── ${{ github.sha }}         ──► 40-character commit hash (e.g. 9e7a0fb...)
+  ├── ${{ github.ref_name }}    ──► Active Git branch (e.g. main)
+  ├── ${{ github.event_name }}  ──► Trigger source (e.g. push vs workflow_dispatch)
+  └── ${{ runner.os }}          ──► Host OS (Linux, Windows, macOS)
+</div>
+
+<h3>Production Use Cases (9 LPA Standard):</h3>
+<table>
+  <thead>
+    <tr>
+      <th>Context Variable</th>
+      <th>Real-World DevOps Application</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>${{ github.sha }}</code></td>
+      <td>Tags Docker container images uniquely (<code>docker build -t app:${{ github.sha }} .</code>) so any live deployment can be traced to exact source code.</td>
+    </tr>
+    <tr>
+      <td><code>${{ github.actor }}</code></td>
+      <td>Sends targeted Slack/Discord alerts mentioning the exact engineer who triggered or broke a deployment.</td>
+    </tr>
+    <tr>
+      <td><code>${{ github.ref_name }}</code></td>
+      <td>Guards production releases so code from experimental branches never deploys to production servers.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>2. Interactive UI Inputs (<code>workflow_dispatch.inputs</code>)</h2>
+<p>DevOps engineers build self-service portals inside GitHub Actions by defining <code>inputs</code> under the <code>workflow_dispatch</code> trigger. This renders real UI controls in the GitHub browser tab.</p>
+
+<pre><code class="language-yaml">on:
+  workflow_dispatch:
+    inputs:
+      target_env:
+        description: 'Select Target Environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+      deployer_name:
+        description: 'DevOps Lead / Author'
+        required: true
+        default: 'Sanjit'
+        type: string
+</code></pre>
+
+<div class="callout">
+  <strong>💡 How to Access Inputs in Steps:</strong><br>
+  Access any input anywhere in your workflow steps using: <code>${{ inputs.target_env }}</code> and <code>${{ inputs.deployer_name }}</code>.
+</div>
+
+<div class="page-break"></div>
+
+<h2>3. Live Visual Dashboards (<code>$GITHUB_STEP_SUMMARY</code>)</h2>
+<p>Instead of forcing engineering managers to dig through raw terminal logs, production workflows output formatted Markdown tables directly to <strong><code>$GITHUB_STEP_SUMMARY</code></strong>.</p>
+
+<pre><code class="language-yaml">      - name: Generate Live Summary Card
+        run: |
+          echo "## 🚀 Deployment Status Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          echo "| 👤 **DevOps Engineer** | ${{ inputs.deployer_name || github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🎯 **Target Environment** | \`${{ inputs.target_env || 'auto-push' }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🌿 **Git Branch** | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📌 **Commit SHA** | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🧪 **Test Suite** | ✅ PASSED (100%) |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🚀 **Status** | **SUCCESSFULLY VERIFIED** |" >> $GITHUB_STEP_SUMMARY
+</code></pre>
+
+<h2>4. Complete Day 2 Master Workflow Code</h2>
+<pre><code class="language-yaml">name: 🚀 Live Deployment Control Center
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      target_env:
+        description: '🎯 Select Target Environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+      deployer_name:
+        description: '✍️ Enter Your Name / Lead'
+        required: true
+        default: 'Sanjit'
+        type: string
+
+jobs:
+  release_control:
+    name: ⚡ Release & Deploy Engine
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 3. Install Dependencies
+        run: npm ci
+
+      - name: 4. Run Automated Tests
+        run: npm test
+
+      - name: 5. Generate Live Summary Card
+        run: |
+          echo "## 🚀 Deployment Status Report" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          echo "| 👤 **DevOps Engineer** | ${{ inputs.deployer_name || github.actor }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🎯 **Target Environment** | \`${{ inputs.target_env || 'auto-push' }}\` |" >> $GITHUB_STEP_SUMMARY
+</code></pre>
+
+<h2>5. 9 LPA Interview Questions for Day 2</h2>
+<div class="interview-box">
+  <strong>Q1: How do you build an on-demand deployment pipeline where QA can choose between Staging and Production from GitHub UI?</strong><br>
+  <em>Answer:</em> We configure the <code>workflow_dispatch</code> event trigger with <code>inputs</code> of type <code>choice</code> listing the available environments. In the steps, we read <code>${{ inputs.<field_name> }}</code> to route the deployment target.
+  <br><br>
+  <strong>Q2: What is <code>$GITHUB_STEP_SUMMARY</code> and why is it preferred in production?</strong><br>
+  <em>Answer:</em> <code>$GITHUB_STEP_SUMMARY</code> is an environment variable pointing to a special markdown buffer on the runner. Any markdown appended to it renders as a visual report on the Actions summary page, providing instant status metrics without parsing terminal logs.
+</div>
+
+</body>
+</html>

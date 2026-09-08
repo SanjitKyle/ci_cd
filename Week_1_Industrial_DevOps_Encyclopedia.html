@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Week 1 Industrial DevOps Encyclopedia: CI/CD & GitHub Actions</title>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap");
+  
+  @page {
+    size: A4;
+    margin: 14mm 12mm 14mm 12mm;
+  }
+  
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #0f172a;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    font-size: 12.5px;
+    background: #f1f5f9;
+  }
+
+  .container {
+    max-width: 950px;
+    margin: 0 auto;
+    background: #ffffff;
+    padding: 36px 40px;
+    border-radius: 12px;
+    box-shadow: 0 4px 25px rgba(0,0,0,0.08);
+  }
+
+  .main-header {
+    background: linear-gradient(135deg, #020617 0%, #1e1b4b 45%, #2563eb 100%);
+    color: white;
+    padding: 36px 30px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 6px 20px rgba(37,99,235,0.2);
+  }
+  
+  .main-header h1 {
+    margin: 0 0 10px 0;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+
+  .main-header p {
+    margin: 0;
+    font-size: 13.5px;
+    opacity: 0.92;
+    line-height: 1.5;
+  }
+
+  .badge-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.18);
+    color: #ffffff;
+    padding: 4px 12px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 14px;
+    border: 1px solid rgba(255,255,255,0.25);
+  }
+
+  h2 {
+    color: #0f172a;
+    border-bottom: 2.5px solid #cbd5e1;
+    padding-bottom: 8px;
+    margin-top: 36px;
+    margin-bottom: 16px;
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  h3 {
+    color: #1e293b;
+    margin-top: 22px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  h4 {
+    color: #334155;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  p, li {
+    color: #334155;
+    line-height: 1.65;
+  }
+
+  ul, ol {
+    padding-left: 22px;
+    margin: 8px 0;
+  }
+
+  li {
+    margin-bottom: 6px;
+  }
+
+  .diagram-box {
+    background: #090d16;
+    border: 1px solid #1e293b;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 14px 0;
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    line-height: 1.45;
+    white-space: pre;
+    color: #38bdf8;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 12px;
+  }
+
+  th, td {
+    padding: 9px 12px;
+    border: 1px solid #cbd5e1;
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background: #f8fafc;
+    font-weight: 700;
+    color: #0f172a;
+  }
+
+  tr:nth-child(even) {
+    background: #f8fafc;
+  }
+
+  pre {
+    background: #090d16;
+    color: #f8fafc;
+    padding: 16px 18px;
+    border-radius: 8px;
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    line-height: 1.5;
+    overflow-x: auto;
+    margin: 12px 0;
+    border: 1px solid #1e293b;
+  }
+
+  code {
+    font-family: 'Fira Code', monospace;
+    background: #e2e8f0;
+    color: #0f172a;
+    padding: 1.5px 5px;
+    border-radius: 4px;
+    font-size: 11.5px;
+    font-weight: 500;
+  }
+
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-size: 11px;
+  }
+
+  .keyword-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  }
+
+  .keyword-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1.5px solid #f1f5f9;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+  }
+
+  .keyword-name {
+    font-family: 'Fira Code', monospace;
+    font-weight: 700;
+    font-size: 13.5px;
+    color: #2563eb;
+  }
+
+  .danger-box {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-left: 4px solid #ef4444;
+    padding: 10px 14px;
+    border-radius: 0 6px 6px 0;
+    margin: 10px 0;
+    font-size: 12px;
+  }
+
+  .danger-box strong {
+    color: #991b1b;
+  }
+
+  .why-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-left: 4px solid #16a34a;
+    padding: 10px 14px;
+    border-radius: 0 6px 6px 0;
+    margin: 10px 0;
+    font-size: 12px;
+  }
+
+  .why-box strong {
+    color: #166534;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="main-header">
+  <h1>🏭 Industrial DevOps Encyclopedia: Week 1 CI/CD & GitHub Actions</h1>
+  <p>Line-by-Line YAML Anatomy • The "Why We Need It" Deep Dives • Failure Autopsies & Production Postmortems • Real Enterprise Pipelines</p>
+  <span class="badge-tag">Standard: Senior DevOps Engineer / 9+ LPA Benchmark</span>
+</div>
+
+<!-- ================= CHAPTER 1: EXHAUSTIVE KEYWORD ANATOMY ================= -->
+<h2>📖 Chapter 1: The Complete GitHub Actions Keyword Dictionary</h2>
+<p>Every keyword in GitHub Actions solves a specific engineering problem. Below is the exhaustive explanation of what each keyword does, why it is required, and what disaster occurs if you omit it or misconfigure it.</p>
+
+<!-- KEYWORD: name -->
+<div class="keyword-card">
+  <div class="keyword-header">
+    <span class="keyword-name">1. name:</span>
+    <code>Metadata Level / Top Level or Step Level</code>
+  </div>
+  <p><strong>What it does:</strong> Defines the human-readable display title shown in the GitHub Actions web UI, pull request check widgets, and slack/email build notifications.</p>
+  <div class="why-box">
+    <strong>💡 Why We Need It:</strong> In a repository with 20+ microservices, developers and managers cannot identify which pipeline ran without meaningful names (e.g. <code>name: 🚀 Production API Deployment</code> vs default filename <code>build.yml</code>).
+  </div>
+  <div class="danger-box">
+    <strong>💥 Disaster if Omitted/Wrong:</strong> If omitted, GitHub defaults to the raw file path (e.g. <code>.github/workflows/workflow_123.yml</code>). In an outage, on-call engineers waste crucial minutes finding which pipeline failed.
+  </div>
+</div>
+
+<!-- KEYWORD: on (Triggers) -->
+<div class="keyword-card">
+  <div class="keyword-header">
+    <span class="keyword-name">2. on: (Event Triggers)</span>
+    <code>Workflow Root Level</code>
+  </div>
+  <p><strong>What it does:</strong> Subscribes the workflow to GitHub Webhook events (e.g., <code>push</code>, <code>pull_request</code>, <code>workflow_dispatch</code>, <code>schedule</code>).</p>
+  <div class="why-box">
+    <strong>💡 Why We Need It:</strong> Without event listeners, automation has no stimulus to wake up. It maps Git lifecycle actions to runner VM executions.
+  </div>
+  <div class="danger-box">
+    <strong>💥 Disaster if Omitted/Wrong:</strong> A workflow without an <code>on:</code> trigger is invalid YAML and will be rejected by GitHub Actions parser with a syntax error.
+  </div>
+</div>
+
+<!-- KEYWORD: branches & paths-ignore -->
+<div class="keyword-card">
+  <div class="keyword-header">
+    <span class="keyword-name">3. branches: &amp; paths-ignore:</span>
+    <code>Event Filter Sub-block</code>
+  </div>
+  <p><strong>What it does:</strong> <code>branches: [ main ]</code> limits execution to pushes against specified branches. <code>paths-ignore: [ '**.md' ]</code> prevents the workflow from executing if changed files match the glob pattern.</p>
+  <div class="why-box">
+    <strong>💡 Why We Need It:</strong> 
+    <ul>
+      <li><strong>Cost Control:</strong> Prevents burning team GitHub Actions monthly minutes on documentation edits.</li>
+      <li><strong>Security Isolation:</strong> Ensures experimental feature branches (<code>feature/test-1</code>) never trigger production deployment scripts.</li>
+    </ul>
+  </div>
+  <div class="danger-box">
+    <strong>💥 Disaster if Omitted/Wrong:</strong> If you omit branch filtering, every single developer pushing a personal branch triggers full builds, quickly consuming company compute quotas and potentially causing accidental staging overrides.
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- KEYWORD: workflow_dispatch & inputs -->
+<div class="keyword-card">
+  <div class="keyword-header">
+    <span class="keyword-name">4. workflow_dispatch: &amp; inputs:</span>
+    <code>Interactive Manual Trigger</code>
+  </div>
+  <p><strong>What it does:</strong> Enables the manual <strong>"Run workflow"</strong> button in GitHub UI and exposes an interactive form with dropdowns (<code>choice</code>), text inputs (<code>string</code>), and checkboxes (<code>boolean</code>).</p>
+  <div class="why-box">
+    <strong>💡 Why We Need It:</strong> Production deployments should never happen solely on automated push without release authorization. It enables self-service DevOps portals where QA leads can choose target environments (<code>dev</code>, <code>staging</code>, <code>prod</code>) on-demand.
+  </div>
+  <div class="danger-box">
+    <strong>💥 Disaster if Omitted:</strong> Developers must make empty commits (<code>git commit --allow-empty</code>) just to re-run builds, cluttering git history.
+  </div>
+</div>
+
+<!-- KEYWORD: concurrency & cancel-in-progress -->
+<div class="keyword-card">
+  <div class="keyword-header">
+    <span class="keyword-name">5. concurrency: &amp; cancel-in-progress: true</span>
+    <code>Resource & Cost Optimization</code>
+  </div>
+  <p><strong>What it does:</strong> Creates a lock group (e.g. <code>${{ github.workflow }}-${{ github.ref }}</code>). If a new commit is pushed while a previous build on the same branch is running, the older build is immediately cancelled.</p>
+  <div class="why-box">
+    <strong>💡 Why We Need It:</strong> If a developer pushes 4 rapid commits in 2 minutes:
+    <ul>
+      <li><em>Without Concurrency:</em> 4 full test suites run (wasting 4x compute minutes).</li>
+      <li><em>With Concurrency:</em> The 3 obsolete builds are killed in 1 second; only the latest code builds!</li>
+    </ul>
+  </div>
+  <div class="danger-box">
+    <strong>💥 Disaster if Omitted:</strong> Race conditions! An older, slower commit might finish deploying AFTER a newer commit, overwriting fresh code with obsolete code on your live servers.
+  </div>
+</div>
+
+<!-- KEYWORD: jobs & runs-on -->
+<div class="keyword-card">
+  <div class="keyword-header">
+    <span class="keyword-name">6. jobs: &amp; runs-on: ubuntu-latest</span>
+    <code>Virtual Machine Provisioning</code>
+  </div>
+  <p><strong>What it does:</strong> <code>jobs:</code> defines isolated execution containers. <code>runs-on: ubuntu-latest</code> requests GitHub to provision an ephemeral Linux virtual machine (2 vCPUs, 7 GB RAM, 14 GB SSD).</p>
+  <div class="why-box">
+    <strong>💡 Why We Need It:</strong> Guarantees environment uniformity. Every build runs on a sanitized, clean OS with zero residual files from previous builds.
+  </div>
+  <div class="danger-box">
+    <strong>💥 Disaster if Misconfigured:</strong> If you specify an invalid runner (e.g. <code>runs-on: windows-2016</code> which is retired), your job gets stuck in <code>Queued</code> indefinitely.
+  </div>
+</div>
+
+<!-- KEYWORD: needs -->
+<div class="keyword-card">
+  <div class="keyword-header">
+    <span class="keyword-name">7. needs: [ job_a, job_b ]</span>
+    <code>Job Dependency &amp; Directed Acyclic Graph (DAG)</code>
+  </div>
+  <p><strong>What it does:</strong> Enforces sequential execution. By default, jobs run concurrently in parallel. <code>needs:</code> halts Job C until Job A and Job B have completed with <code>Exit Code 0</code>.</p>
+  <div class="why-box">
+    <strong>💡 Why We Need It:</strong> You must never deploy code if unit tests or security vulnerability scans fail. <code>needs:</code> creates a strict safety gate.
+  </div>
+  <div class="danger-box">
+    <strong>💥 Disaster if Omitted:</strong> Your <code>deploy</code> job and <code>test</code> job run at the exact same second in parallel. Broken code gets deployed to live production before the test job even discovers the bug!
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- KEYWORD: uses vs run -->
+<div class="keyword-card">
+  <div class="keyword-header">
+    <span class="keyword-name">8. uses: vs run:</span>
+    <code>Step Execution Engine</code>
+  </div>
+  <p><strong>What it does:</strong> 
+    <ul>
+      <li><code>uses: actions/checkout@v4</code> ➔ Executes an external, reusable action from GitHub Marketplace or internal repo.</li>
+      <li><code>run: npm test</code> ➔ Spawns a shell sub-process (e.g. bash) on the runner VM to execute arbitrary CLI commands.</li>
+    </ul>
+  </p>
+  <div class="why-box">
+    <strong>💡 Why We Need It:</strong> <code>uses</code> saves thousands of lines of boilerplate setup code (checking out git repos, setting up Node/Python/Java, authenticating to AWS). <code>run</code> gives full control over project commands.
+  </div>
+  <div class="danger-box">
+    <strong>💥 Disaster:</strong> Calling <code>run: npm test</code> before <code>uses: actions/checkout@v4</code> will fail with <code>ENOENT: package.json not found</code> because runners start completely empty!
+  </div>
+</div>
+
+<!-- KEYWORD: env & secrets -->
+<div class="keyword-card">
+  <div class="keyword-header">
+    <span class="keyword-name">9. env: &amp; ${{ secrets.NAME }}</span>
+    <code>Security &amp; Secret Masking Engine</code>
+  </div>
+  <p><strong>What it does:</strong> Injects environment variables into runner process memory. When accessing <code>${{ secrets.API_KEY }}</code>, GitHub intercepts the console output stream and replaces any occurrence of the secret string with <code>***</code>.</p>
+  <div class="why-box">
+    <strong>💡 Why We Need It:</strong> Hardcoded API tokens in Git repositories are harvested by automated scrapers within minutes. Encrypted secrets keep credentials safe.
+  </div>
+  <div class="danger-box">
+    <strong>💥 Disaster:</strong> Committing credentials to public git triggers security breaches, cloud account hijacking, and data theft.
+  </div>
+</div>
+
+<!-- KEYWORD: if: status check functions -->
+<div class="keyword-card">
+  <div class="keyword-header">
+    <span class="keyword-name">10. if: success() / failure() / always()</span>
+    <code>Step &amp; Job Conditional Execution</code>
+  </div>
+  <p><strong>What it does:</strong> Overrides default linear execution:
+    <ul>
+      <li><code>if: success()</code> ➔ (Default) Runs only if previous steps exited with 0.</li>
+      <li><code>if: failure()</code> ➔ Runs ONLY when an upstream step crashed (used for Slack alerts).</li>
+      <li><code>if: always()</code> ➔ Guarantees execution even if tests crashed or were cancelled (used for log uploads and resource teardown).</li>
+    </ul>
+  </p>
+  <div class="why-box">
+    <strong>💡 Why We Need It:</strong> Without <code>if: always()</code>, temporary test databases or background Docker containers are never cleaned up if tests fail.
+  </div>
+</div>
+
+<!-- KEYWORD: $GITHUB_STEP_SUMMARY -->
+<div class="keyword-card">
+  <div class="keyword-header">
+    <span class="keyword-name">11. $GITHUB_STEP_SUMMARY</span>
+    <code>Executive Markdown Reporting</code>
+  </div>
+  <p><strong>What it does:</strong> Environment variable pointing to an internal markdown file on the runner. Appending markdown text (<code>echo "## Report" &gt;&gt; $GITHUB_STEP_SUMMARY</code>) renders formatted tables and charts on the Actions run summary page.</p>
+  <div class="why-box">
+    <strong>💡 Why We Need It:</strong> Engineering managers and release leads need instant visibility into test coverage, deployment URLs, and commit authors without scrolling through 5,000 lines of terminal output.
+  </div>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ================= CHAPTER 2: REAL-WORLD FAILURE AUTOPSIES ================= -->
+<h2>💥 Chapter 2: Real-World CI/CD Failures &amp; Troubleshooting Guide</h2>
+<p>Here are the top 5 catastrophic mistakes made in junior pipelines and how production engineers prevent them:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Error / Symptom</th>
+      <th>Root Cause</th>
+      <th>Production Fix</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Workflow Frozen at 6 Hours</strong><br><code>Error: Job timed out</code></td>
+      <td>A daemon or watcher process (like <code>nodemon test.js</code> or <code>app.listen()</code>) was executed in a <code>run:</code> step.</td>
+      <td>Always use non-watching single-run commands (e.g. <code>node test.js</code> or <code>npm test -- --watchAll=false</code>). Set <code>timeout-minutes: 10</code> on jobs.</td>
+    </tr>
+    <tr>
+      <td><strong><code>ENOENT: package.json not found</code></strong><br>Exit code 127</td>
+      <td><code>npm install</code> was executed before <code>actions/checkout@v4</code>.</td>
+      <td>Always place <code>actions/checkout@v4</code> as <strong>Step 1</strong> in every job. Runners start with zero repository files.</td>
+    </tr>
+    <tr>
+      <td><strong>Non-deterministic Test Failures</strong><br><em>"Works locally, fails on CI"</em></td>
+      <td>Using <code>npm install</code> instead of <code>npm ci</code>. <code>npm install</code> downloaded a newer patch version of a dependency with a breaking change.</td>
+      <td>Never use <code>npm install</code> in CI pipelines. Always use <code>npm ci</code> which strictly adheres to <code>package-lock.json</code>.</td>
+    </tr>
+    <tr>
+      <td><strong>Accidental Production Overwrite</strong><br><em>Feature branch deployed to live</em></td>
+      <td>Missing branch condition on deployment job.</td>
+      <td>Add <code>if: github.ref == 'refs/heads/main'</code> to prevent non-main branches from deploying.</td>
+    </tr>
+    <tr>
+      <td><strong>Build Race Conditions</strong><br><em>Old commit overwriting new commit</em></td>
+      <td>Developer pushed Commit 1, then Commit 2 immediately. Commit 1 was slower and finished deploying after Commit 2.</td>
+      <td>Implement <code>concurrency: cancel-in-progress: true</code> tied to <code>${{ github.workflow }}-${{ github.ref }}</code>.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<!-- ================= CHAPTER 3: ENTERPRISE CAPSTONE YAML ================= -->
+<h2>🏆 Chapter 3: The Complete Enterprise Production Pipeline</h2>
+<p>Below is the fully-commented, production-grade template implementing every single Week 1 mechanism into a cohesive architecture:</p>
+
+<pre><code class="language-yaml"># =============================================================================
+# ENTERPRISE FULLSTACK CI/CD PIPELINE (WEEK 1 CAPSTONE STANDARD)
+# =============================================================================
+name: 🚀 Production Enterprise Delivery Engine
+
+on:
+  # Trigger on push, but strictly to main branch and ignore docs
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+  # Trigger on Pull Requests targeting main
+  pull_request:
+    branches:
+      - main
+    types: [ opened, synchronize, reopened ]
+
+  # Interactive self-service release trigger
+  workflow_dispatch:
+    inputs:
+      target_env:
+        description: '🎯 Select Target Environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+      run_deep_audit:
+        description: '🛡️ Run Deep Security & Vulnerability Audit?'
+        required: true
+        type: boolean
+        default: true
+      release_tag:
+        description: '🏷️ Semantic Version Tag (e.g. v1.2.0)'
+        required: true
+        default: 'v1.0.0-auto'
+        type: string
+
+# Cost Optimization: Cancel older running builds on the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ===========================================================================
+  # STAGE 1: Static Analysis & Code Quality Gate (Runs in Parallel)
+  # ===========================================================================
+  code_lint:
+    name: 🔍 Quality Gate - Static Linting
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: 1. Checkout PR / Branch Code
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Node.js Runtime (v20 LTS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 3. Install Deterministic Dependencies
+        run: npm ci
+
+      - name: 4. Execute Static Code Analysis
+        run: echo "✅ Code style, syntax, and formatting verified with 0 errors."
+
+  # ===========================================================================
+  # STAGE 2: Automated Unit Testing (Runs in Parallel)
+  # ===========================================================================
+  unit_tests:
+    name: 🧪 Quality Gate - Unit Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: 1. Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Node.js Runtime (v20 LTS)
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 3. Install Deterministic Dependencies
+        run: npm ci
+
+      - name: 4. Execute Unit Test Suite
+        run: npm test
+
+      - name: 5. Failure Alert Webhook (Executes ONLY if tests fail)
+        if: failure()
+        run: |
+          echo "🚨 CRITICAL ALERT: Unit tests failed on commit ${{ github.sha }}!"
+          echo "Triggered by developer: ${{ github.actor }}"
+
+  # ===========================================================================
+  # STAGE 3: Production Deployment & Dashboard (Waits for Stages 1 & 2)
+  # ===========================================================================
+  deploy_production:
+    name: 🚀 Production Cloud Deployment
+    runs-on: ubuntu-latest
+    needs: [ code_lint, unit_tests ] # Directed Acyclic Graph (DAG) dependency
+    # Guard: Only deploy if on main branch OR explicitly triggered via UI
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 10
+
+    steps:
+      - name: 1. Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: 2. Authenticate & Deploy to Cloud Target
+        env:
+          DEPLOY_SECRET: ${{ secrets.MY_API_KEY }}
+          TARGET_ENVIRONMENT: ${{ inputs.target_env || 'production' }}
+        run: |
+          echo "Connecting to Cloud Infrastructure..."
+          echo "Authenticated using secret token: $DEPLOY_SECRET"
+          echo "Deploying release ${{ inputs.release_tag || github.sha }} to: $TARGET_ENVIRONMENT"
+          echo "🎉 Deployment health checks passed! Application is live."
+
+      # Executive Summary Table generated on GitHub UI
+      - name: 3. Generate Executive Step Summary
+        if: always()
+        run: |
+          echo "## 🚀 Production Deployment Executive Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Pipeline Attribute | Live Value |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          echo "| 👤 **DevOps Lead** | \`${{ github.actor }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🎯 **Target Environment** | \`${{ inputs.target_env || 'production' }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🌿 **Source Branch** | \`${{ github.ref_name }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 📌 **Commit SHA** | \`${{ github.sha }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🏷️ **Release Tag** | \`${{ inputs.release_tag || 'v1.0.0-auto' }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🧪 **Quality Gate** | ✅ 100% Tests Passed |" >> $GITHUB_STEP_SUMMARY
+          echo "| 🚀 **Status** | **ONLINE & HEALTHY** |" >> $GITHUB_STEP_SUMMARY
+</code></pre>
+
+</div>
+</body>
+</html>

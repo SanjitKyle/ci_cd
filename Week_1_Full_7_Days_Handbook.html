@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Week 1: Complete 7-Day CI/CD Master Handbook</title>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap");
+  
+  @page {
+    size: A4;
+    margin: 14mm 12mm 14mm 12mm;
+  }
+  
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1e293b;
+    line-height: 1.55;
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+    background: #fff;
+  }
+
+  .main-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #4338ca 100%);
+    color: white;
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .main-header h1 {
+    margin: 0 0 6px 0;
+    font-size: 24px;
+    font-weight: 800;
+  }
+
+  .main-header p {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.9;
+  }
+
+  .day-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 20px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+  }
+
+  .day-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 12px;
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .status-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 9999px;
+    font-weight: 600;
+  }
+
+  .status-done {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .status-upcoming {
+    background: #eff6ff;
+    color: #1e40af;
+  }
+
+  h3 {
+    color: #334155;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    font-size: 13.5px;
+    font-weight: 600;
+  }
+
+  .diagram-box {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    line-height: 1.4;
+    white-space: pre;
+    color: #0f172a;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+    font-size: 11.5px;
+  }
+
+  th, td {
+    padding: 6px 10px;
+    border: 1px solid #cbd5e1;
+    text-align: left;
+  }
+
+  th {
+    background: #f1f5f9;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  tr:nth-child(even) {
+    background: #f8fafc;
+  }
+
+  pre {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    line-height: 1.4;
+    overflow-x: auto;
+    margin: 8px 0;
+  }
+
+  code {
+    font-family: 'Fira Code', monospace;
+    background: #e2e8f0;
+    color: #0f172a;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 11px;
+  }
+
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+  }
+
+  .tip-box {
+    background: #f0fdf4;
+    border-left: 3px solid #22c55e;
+    padding: 8px 12px;
+    border-radius: 0 6px 6px 0;
+    margin: 10px 0;
+    font-size: 12px;
+  }
+
+  .interview-box {
+    background: #fdf4ff;
+    border-left: 3px solid #c026d3;
+    padding: 8px 12px;
+    border-radius: 0 6px 6px 0;
+    margin: 10px 0;
+    font-size: 12px;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+</style>
+</head>
+<body>
+
+<div class="main-header">
+  <h1>📘 Week 1: Complete 7-Day CI/CD Master Handbook</h1>
+  <p>Your step-by-step roadmap from total beginner to production-grade GitHub Actions engineering.</p>
+</div>
+
+<!-- ================= DAY 1 ================= -->
+<div class="day-card">
+  <div class="day-title">
+    <span>Day 1: Foundations, Runners & Quality Gates</span>
+    <span class="status-badge status-done">COMPLETED ✅</span>
+  </div>
+  
+  <p><strong>Core Concept:</strong> CI (Continuous Integration) automatically tests code on every push, while CD (Continuous Deployment) automatically delivers tested releases to servers.</p>
+  
+  <div class="diagram-box">
+Developer (git push) ──► GitHub Cloud Runner (Ubuntu VM) ──► Checkout ──► Install ──► Test (Exit 0=Pass / Exit 1=Fail)
+  </div>
+
+  <h3>Key Learnings:</h3>
+  <ul>
+    <li><strong>The 5 Building Blocks:</strong> Workflows (<code>.github/workflows/*.yml</code>) ➔ Triggers (<code>on:</code>) ➔ Jobs (<code>jobs:</code>) ➔ Runners (<code>runs-on:</code>) ➔ Steps (<code>steps:</code>).</li>
+    <li><strong>Marketplace Actions (<code>uses:</code>):</strong> <code>actions/checkout@v4</code> downloads code onto the empty cloud runner. <code>actions/setup-node@v4</code> installs Node.js.</li>
+    <li><strong>Exit Codes:</strong> Terminal exit code <code>0</code> means success. Any exit code <code>1+</code> halts the workflow with a red ❌.</li>
+    <li><strong>Golden Rule:</strong> Never run persistent tools (e.g. <code>nodemon</code> or <code>npm start</code>) in CI. Commands must execute and exit.</li>
+  </ul>
+</div>
+
+<!-- ================= DAY 2 ================= -->
+<div class="day-card">
+  <div class="day-title">
+    <span>Day 2: Context Objects, Interactive UI & Step Summaries</span>
+    <span class="status-badge status-done">COMPLETED ✅</span>
+  </div>
+
+  <p><strong>Core Concept:</strong> Dynamically adapt pipelines using GitHub's metadata and interactive UI controls.</p>
+
+  <h3>Key Learnings:</h3>
+  <ul>
+    <li><strong>Context Objects (<code>${{ github.* }}</code>):</strong> Access dynamic data like <code>github.actor</code> (who ran it), <code>github.sha</code> (commit ID), and <code>github.ref_name</code> (branch).</li>
+    <li><strong>Interactive Dropdowns (<code>workflow_dispatch.inputs</code>):</strong> Creates self-service UI controls on GitHub where users can select environments (e.g., <code>development</code>, <code>staging</code>, <code>production</code>) or enter custom parameters.</li>
+    <li><strong>Live Dashboards (<code>$GITHUB_STEP_SUMMARY</code>):</strong> Appending markdown tables to this environment variable renders beautiful reports directly on the GitHub Actions summary page.</li>
+    <li><strong>Secrets Masking:</strong> GitHub automatically redacts repository secrets (e.g. <code>${{ secrets.MY_API_KEY }}</code>) with <code>***</code> in logs.</li>
+  </ul>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ================= DAY 3 ================= -->
+<div class="day-card">
+  <div class="day-title">
+    <span>Day 3: Concurrency & Cancelling Stale Builds</span>
+    <span class="status-badge status-upcoming">DAY 3 (TOMORROW) ⏳</span>
+  </div>
+
+  <p><strong>Core Concept:</strong> Save cloud bills and runner minutes by automatically cancelling outdated running pipelines when new commits arrive.</p>
+
+  <div class="diagram-box">
+Push Commit 1 (Build Running 🟡) ──► Push Commit 2 ──► Commit 1 Automatically Cancelled ⛔ ──► Commit 2 Runs 🟢
+  </div>
+
+  <h3>Key Code Pattern:</h3>
+  <pre><code class="language-yaml"># Cancels any ongoing build for the same branch when a new commit is pushed
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+</code></pre>
+
+  <div class="tip-box">
+    <strong>💡 Why Companies Demand This:</strong> If a developer pushes 5 commits in 2 minutes, without concurrency GitHub runs 5 separate builds (wasting 20+ build minutes). Concurrency kills the old 4 runs and only builds the latest code!
+  </div>
+</div>
+
+<!-- ================= DAY 4 ================= -->
+<div class="day-card">
+  <div class="day-title">
+    <span>Day 4: Status Check Functions & Self-Healing Pipelines</span>
+    <span class="status-badge status-upcoming">DAY 4 ⏳</span>
+  </div>
+
+  <p><strong>Core Concept:</strong> Control step execution based on whether previous steps passed, failed, or were cancelled.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Status Function</th>
+        <th>When It Executes</th>
+        <th>Production Example</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>if: success()</code></td>
+        <td>Default. Runs only if all previous steps succeeded.</td>
+        <td>Proceed to deployment.</td>
+      </tr>
+      <tr>
+        <td><code>if: failure()</code></td>
+        <td>Runs ONLY if ANY previous step failed.</td>
+        <td>Send an alert to Slack/Discord or email the engineer.</td>
+      </tr>
+      <tr>
+        <td><code>if: always()</code></td>
+        <td>Runs ALWAYS, even if tests crash or are cancelled.</td>
+        <td>Upload crash logs and shut down temporary test databases.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ================= DAY 5 ================= -->
+<div class="day-card">
+  <div class="day-title">
+    <span>Day 5: Code Quality Gates (ESLint & PR Merge Guards)</span>
+    <span class="status-badge status-upcoming">DAY 5 ⏳</span>
+  </div>
+
+  <p><strong>Core Concept:</strong> Enforce high engineering standards automatically before code can be merged into the master codebase.</p>
+
+  <ul>
+    <li><strong>Static Code Analysis (ESLint):</strong> Automatically checks JavaScript code for unused variables, missing semicolons, or security flaws.</li>
+    <li><strong>Pull Request Protection:</strong> Automatically runs tests when a PR is opened. If tests or linters fail, GitHub locks the "Merge" button.</li>
+  </ul>
+</div>
+
+<div class="page-break"></div>
+
+<!-- ================= DAY 6 ================= -->
+<div class="day-card">
+  <div class="day-title">
+    <span>Day 6: Multi-Job Pipelines & Dependency Graphs</span>
+    <span class="status-badge status-upcoming">DAY 6 ⏳</span>
+  </div>
+
+  <p><strong>Core Concept:</strong> Divide complex systems into modular jobs (Lint ➔ Test ➔ Build ➔ Deploy) connected with <code>needs:</code>.</p>
+
+  <div class="diagram-box">
+[ Job 1: Lint & Code Style ] ──┬──► [ Job 3: Integration Tests ] ──► [ Job 4: Production Deploy ]
+[ Job 2: Unit Tests        ] ──┘         (needs: [lint, test])            (if: branch == 'main')
+  </div>
+
+  <h3>Key Code Pattern:</h3>
+  <pre><code class="language-yaml">jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps: [ ... ]
+
+  test:
+    runs-on: ubuntu-latest
+    steps: [ ... ]
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [lint, test]       # Waits for BOTH lint and test to pass!
+    if: github.ref == 'refs/heads/main'
+    steps: [ ... ]
+</code></pre>
+</div>
+
+<!-- ================= DAY 7 ================= -->
+<div class="day-card">
+  <div class="day-title">
+    <span>Day 7: Week 1 Production Capstone & 9 LPA Interview Q&A</span>
+    <span class="status-badge status-upcoming">DAY 7 ⏳</span>
+  </div>
+
+  <p><strong>Core Concept:</strong> Build a complete end-to-end enterprise workflow from scratch and practice senior interview questions.</p>
+
+  <div class="interview-box">
+    <strong>🔥 Top 9 LPA Interview Questions for Week 1:</strong>
+    <ol>
+      <li><strong>Q: What is the difference between <code>uses</code> and <code>run</code>?</strong><br>
+      <em>A: <code>uses</code> calls pre-packaged, reusable actions from the GitHub marketplace, while <code>run</code> executes arbitrary terminal/shell commands on the runner.</em></li>
+      <li><strong>Q: How do you prevent wasted compute when rapid commits are pushed?</strong><br>
+      <em>A: We define a <code>concurrency</code> group with <code>cancel-in-progress: true</code> tied to the branch ref.</em></li>
+      <li><strong>Q: Why does GitHub Actions fail when a command exits with code 1?</strong><br>
+      <em>A: Standard POSIX convention dictates that exit code 0 is success and any non-zero exit code represents a runtime error. GitHub monitors the process exit code to gate execution.</em></li>
+      <li><strong>Q: How do you ensure cleanup steps run even if tests crash?</strong><br>
+      <em>A: We attach the <code>if: always()</code> status check function to the cleanup step.</em></li>
+    </ol>
+  </div>
+</div>
+
+</body>
+</html>
