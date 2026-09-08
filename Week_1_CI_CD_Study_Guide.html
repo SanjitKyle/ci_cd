@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Week 1 CI/CD & GitHub Actions Study Guide</title>
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Fira+Code:wght@400;500&display=swap");
+  
+  @page {
+    size: A4;
+    margin: 16mm 14mm 16mm 14mm;
+  }
+  
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #1e293b;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    font-size: 13.5px;
+    background: #fff;
+  }
+
+  .header {
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+    color: white;
+    padding: 24px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+  
+  .header h1 {
+    margin: 0 0 6px 0;
+    font-size: 24px;
+    font-weight: 800;
+  }
+
+  .header p {
+    margin: 0;
+    font-size: 13px;
+    opacity: 0.9;
+  }
+
+  h2 {
+    color: #1e293b;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 5px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-size: 17px;
+    page-break-after: avoid;
+  }
+
+  h3 {
+    color: #334155;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    page-break-after: avoid;
+  }
+
+  .diagram-box {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 14px;
+    margin: 12px 0;
+    font-family: 'Fira Code', monospace;
+    font-size: 11.5px;
+    line-height: 1.4;
+    white-space: pre;
+    color: #0f172a;
+    page-break-inside: avoid;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 12px;
+    page-break-inside: avoid;
+  }
+
+  th, td {
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    text-align: left;
+  }
+
+  th {
+    background: #f1f5f9;
+    font-weight: 700;
+    color: #1e293b;
+  }
+
+  tr:nth-child(even) {
+    background: #f8fafc;
+  }
+
+  pre {
+    background: #0f172a;
+    color: #f8fafc;
+    padding: 12px 14px;
+    border-radius: 8px;
+    font-family: 'Fira Code', monospace;
+    font-size: 11.5px;
+    line-height: 1.4;
+    overflow-x: auto;
+    margin: 10px 0;
+    page-break-inside: avoid;
+  }
+
+  code {
+    font-family: 'Fira Code', monospace;
+    background: #e2e8f0;
+    color: #0f172a;
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 11.5px;
+  }
+
+  pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+  }
+
+  .badge-pass {
+    display: inline-block;
+    background: #dcfce7;
+    color: #166534;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 11px;
+  }
+
+  .badge-fail {
+    display: inline-block;
+    background: #fee2e2;
+    color: #991b1b;
+    padding: 2px 7px;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 11px;
+  }
+
+  .callout-warning {
+    background: #fffbeb;
+    border-left: 4px solid #f59e0b;
+    padding: 10px 14px;
+    border-radius: 0 8px 8px 0;
+    margin: 12px 0;
+    font-size: 12.5px;
+  }
+
+  .page-break {
+    page-break-before: always;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📘 Week 1: CI/CD & GitHub Actions Master Guide</h1>
+  <p>Foundations • YAML Architecture • Triggers & Filters • Quality Gates • Secrets Security • Multi-Job Pipelines</p>
+</div>
+
+<h2>1. Core Concepts: What is CI/CD?</h2>
+<p>In modern software engineering, <strong>CI/CD</strong> automates the journey of code from a developer's laptop to live cloud servers.</p>
+
+<div class="diagram-box">
+[ Developer Machine ] ───( git push )───► [ GitHub Actions Runner (Ubuntu VM) ]
+                                                   │
+     ┌─────────────────────────────────────────────┴─────────────────────────────────────────────┐
+     ▼ (Continuous Integration - CI)                                                             ▼ (Continuous Deployment - CD)
+  1. Checkout Code ──► 2. Setup Node.js ──► 3. Install Packages ──► 4. Run Automated Tests  ───► 5. Deploy to Production
+</div>
+
+<ul>
+  <li><strong>CI (Continuous Integration):</strong> Automatically tests, lints, and builds code on every commit or Pull Request to catch bugs early.</li>
+  <li><strong>CD (Continuous Delivery / Deployment):</strong> Automatically packages and deploys validated code to staging/production servers.</li>
+</ul>
+
+<h2>2. The 5 Building Blocks of GitHub Actions</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Building Block</th>
+      <th>YAML Keyword</th>
+      <th>What It Does</th>
+      <th>Example</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>1. Workflow</strong></td>
+      <td><code>name:</code></td>
+      <td>The overall automated pipeline in <code>.github/workflows/*.yml</code></td>
+      <td><code>name: Production CI</code></td>
+    </tr>
+    <tr>
+      <td><strong>2. Trigger</strong></td>
+      <td><code>on:</code></td>
+      <td>The specific event that starts the workflow</td>
+      <td><code>on: [push, pull_request]</code></td>
+    </tr>
+    <tr>
+      <td><strong>3. Job</strong></td>
+      <td><code>jobs:</code></td>
+      <td>A set of steps that execute on a single runner</td>
+      <td><code>jobs: run-tests:</code></td>
+    </tr>
+    <tr>
+      <td><strong>4. Runner</strong></td>
+      <td><code>runs-on:</code></td>
+      <td>The virtual machine operating system provided by GitHub</td>
+      <td><code>runs-on: ubuntu-latest</code></td>
+    </tr>
+    <tr>
+      <td><strong>5. Steps</strong></td>
+      <td><code>steps:</code></td>
+      <td>Individual sequential tasks (actions or terminal commands)</td>
+      <td><code>uses: actions/checkout@v4</code><br><code>run: npm test</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="page-break"></div>
+
+<h2>3. Mastering Triggers, Branch Filters & Path Filters</h2>
+<p>The <code>on:</code> block controls exactly when runners should execute, saving build minutes and compute budget.</p>
+
+<pre><code class="language-yaml">name: Triggers and Filters
+
+on:
+  # 1. Branch Filtering: Run on push only to main branch
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'      # 2. Path Filtering: Skip workflow if only markdown changes
+
+  # 3. Pull Request Trigger: Test code before merging to main
+  pull_request:
+    branches:
+      - main
+
+  # 4. Manual Dispatch: Adds a clickable "Run workflow" button in GitHub UI
+  workflow_dispatch:
+</code></pre>
+
+<h2>4. Automated Quality Gates & Exit Codes</h2>
+<p>GitHub Actions uses terminal <strong>Exit Codes</strong> to determine build status:</p>
+<ul>
+  <li><span class="badge-pass">Exit Code 0</span> = <strong>SUCCESS</strong> ➔ Step passes, pipeline continues.</li>
+  <li><span class="badge-fail">Exit Code 1+</span> = <strong>FAILURE</strong> ➔ Step fails, entire workflow halts immediately!</li>
+</ul>
+
+<h3>Writing an Automated Test in JavaScript (<code>test.js</code>):</h3>
+<pre><code class="language-javascript">// test.js
+function add(a, b) {
+  return a + b;
+}
+
+if (add(5, 5) === 10) {
+  console.log("✅ Math test passed!");
+  process.exit(0); // Exit Code 0: CI passes
+} else {
+  console.error("❌ Math test failed!");
+  process.exit(1); // Exit Code 1: CI fails
+}
+</code></pre>
+
+<div class="callout-warning">
+  <strong>⚠️ Golden Rule of CI/CD:</strong><br>
+  Never run watch mode / live reloaders (e.g. <code>nodemon</code> or <code>webpack --watch</code>) or persistent server listeners in CI! Commands must execute, finish, and exit cleanly.
+</div>
+
+<h2>5. Managing Secrets & Security</h2>
+<p>Never commit passwords, API keys, or private tokens to Git repositories. Store them in <strong>Repo Settings ➔ Secrets and variables ➔ Actions</strong>.</p>
+
+<pre><code class="language-yaml">      - name: Use Secret in Step
+        env:
+          # Injects encrypted secret into an environment variable
+          API_KEY: ${{ secrets.MY_API_KEY }}
+        run: |
+          echo "Authenticating service..."
+          echo "Key is: $API_KEY"  # Log will display: Key is: ***
+</code></pre>
+<p><em>GitHub automatically redacts and masks all secrets as <code>***</code> in logs.</em></p>
+
+<div class="page-break"></div>
+
+<h2>6. Multi-Job Pipelines & Dependency Graphs (<code>needs:</code>)</h2>
+<p>By default, multiple jobs run concurrently in parallel. Use <code>needs:</code> to sequence them and create a dependency graph.</p>
+
+<div class="diagram-box">
+  ┌─────────────────────────┐
+  │   🧪 CI: Lint & Test     │
+  └────────────┬────────────┘
+               │ (needs: ci_testing)
+               ▼
+  ┌─────────────────────────┐
+  │  🚀 CD: Production Deploy│
+  └─────────────────────────┘
+</div>
+
+<h2>7. Complete Week 1 Production Pipeline Template</h2>
+<pre><code class="language-yaml">name: Production CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore: [ '**.md' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  # ==========================================
+  # JOB 1: Continuous Integration (CI)
+  # ==========================================
+  ci_testing:
+    name: 🧪 CI - Lint & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 1. Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 2. Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: 3. Install Dependencies
+        run: npm ci
+
+      - name: 4. Run Automated Test Suite
+        run: npm test
+
+  # ==========================================
+  # JOB 2: Continuous Deployment (CD)
+  # ==========================================
+  cd_deployment:
+    name: 🚀 CD - Deploy to Production
+    runs-on: ubuntu-latest
+    needs: ci_testing
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: 1. Checkout Code
+        uses: actions/checkout@v4
+
+      - name: 2. Deploy using Secret Token
+        env:
+          SECRET_TOKEN: ${{ secrets.MY_API_KEY }}
+        run: |
+          echo "Deploying application to cloud server..."
+          echo "Authenticated Token: $SECRET_TOKEN"
+          echo "🎉 Deployment Completed Successfully!"
+</code></pre>
+
+</body>
+</html>
