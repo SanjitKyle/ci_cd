@@ -1,6 +1,16 @@
-name: First yml file to test the workflow
+name: exercise 2 Trigger and filters 
 on: 
  push:
+  branches:
+   - main
+  path-ignores:
+   - '**.md'
+  workflow_dispatch:
+
+  jobs:
+   filter_jobs:
+     runs-on: ubuntu-
+
 
 jobs:
  my_first_job:
@@ -8,8 +18,8 @@ jobs:
   steps:
     - name: Step 1 -  Check out repository
       uses: actions/checkout@v4
-    - name: Step 2- Check the version of node 
-      run: node -v
-    - name : step 3 - print success message
-      run: echo "Hellow , this is first yml file to test the workflow"
-      
+    - name: Step 2 - Print Trigger Info
+      run : |
+        echo " Branch Triggers : ${{github.ref_name}}"
+        echo "Event Type  : ${{github.event_name}}"
+        
