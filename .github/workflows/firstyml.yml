@@ -1,23 +1,26 @@
-name: exercise quality gate 
+name: exercise quality gate
+
 on:
- push:
-  branches:
-   - main 
- workflow_dispatch:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  run_quaity_test:
-   runs-on: ubuntu-latest
-  steps:
-   - name: step 2 - checkout repository
-     uses: actions/checkout@v4
-   - name : step 2 - setup node js 
-     uses: actions/setup-node@v4
-     with:
-       node-version: 20 
-   - name : step 3 - install dependency 
-     run: npm ci
-   - name : step4 - Execute the unit test 
-     run : npm test 
-    
-    
+  run_quality_test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Step 1 - Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Step 2 - Setup node js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Step 3 - Install dependency
+        run: npm ci
+
+      - name: Step 4 - Execute unit test
+        run: npm test
