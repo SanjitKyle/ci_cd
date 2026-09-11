@@ -1,25 +1,23 @@
-name: exercise 2 Trigger and filters 
-on: 
+name: exercise quality gate 
+on:
  push:
   branches:
-   - main
-  path-ignores:
-   - '**.md'
-  workflow_dispatch:
-
-  jobs:
-   filter_jobs:
-     runs-on: ubuntu-
-
+   - main :
+ workflow_dispatch:
 
 jobs:
- my_first_job:
-  runs-on: ubuntu-latest 
-  steps:
-    - name: Step 1 -  Check out repository
-      uses: actions/checkout@v4
-    - name: Step 2 - Print Trigger Info
-      run : |
-        echo " Branch Triggers : ${{github.ref_name}}"
-        echo "Event Type  : ${{github.event_name}}"
-        
+ run_quaity_test:
+  runs-on: ubuntu-latest
+ steps:
+   - name: step 2 - checkout repository
+     uses: actions/checkout@v4
+   - name : step 2 - setup node js 
+     uses: actions/setup-node@v4
+     with:
+       node-version: 20 
+   - name : step 3 - install dependency 
+     run: npm ci
+   - name : step4 - Execute the unit test 
+     run : npm test 
+    
+    
