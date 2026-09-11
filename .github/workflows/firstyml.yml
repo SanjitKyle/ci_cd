@@ -1,26 +1,18 @@
-name: exercise quality gate
-
+name: Exercise first practice 
+  
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
-
 jobs:
-  run_quality_test:
+  my_first_job:
     runs-on: ubuntu-latest
-
-    steps:
-      - name: Step 1 - Checkout repository
+    
+    steps: 
+      - name : Step 1 Download the repository
         uses: actions/checkout@v4
 
-      - name: Step 2 - Setup node js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Step 3 - Install dependency
-        run: npm ci
-
-      - name: Step 4 - Execute unit test
-        run: npm test
+      - name : Step 2 check installed verison of node 
+        run : node -v 
+      - name : Step 3 Print message
+        run : echo "Yml is succesfully"
+ 
+   
