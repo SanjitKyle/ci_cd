@@ -1,15 +1,23 @@
-name : Exercise 1 
+name : Exercise 2 - Trigger and filters
 on:
  push:
+  branches:
+   - main 
+
+  path-ignores:
+   - "**md"
+
+  workflow_dispatch:
+
 
 jobs:
- my_first_job:
+ filter_test_job:
    runs-on: ubuntu-latest 
 
    steps: 
-    - name : Step 1 - Download the repository 
+    - name : Step 1 - check the repo 
       uses: actions/checkout@v4
-    - name : Step 2- view node version 
-      run: node -v 
-    - name : Step 3 - Print Completetion Message   
-      run : echo "Yml practice 1 completed "
+    - name : Step 2- Print Trigger Info 
+      run: |
+       echo "branch triggered :${{github.ref_name}}"
+       echo "Event type ${{github.event_name}}"
