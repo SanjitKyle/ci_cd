@@ -1,0 +1,27 @@
+name: Exercise 4 Environment Variables and Secrets 
+on:
+ push:
+  branches:
+   - main 
+workflow_dispatch:
+
+jobs:
+ secrets_jobs:
+  runs-on: ubuntu-latest 
+ env: 
+  APP_NAME : "Github actions Learning APP"
+  APP_ENV: "stagging"
+ steps:
+  - name : Step 1- Checkout repository code 
+    uses: actions/checkout@v4
+  - name : step 2 - setup node js 
+    uses: actions/setup-node@v4
+    with:
+     node-version: 20 
+  - name: Step 4 - use encrypt secret safely 
+    env:
+     MY_SECRET: ${{secrets.MY_API_KEY}}
+    run: |
+     echo "Connecting to external database "
+     echo "Secret Token value is: $MY_SECRET"
+
