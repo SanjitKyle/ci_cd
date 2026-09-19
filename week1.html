@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 1 CI/CD Master Notes</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #f4f7f6;
+        }
+        h1 {
+            text-align: center;
+            color: #24292e;
+            border-bottom: 2px solid #0366d6;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #0366d6;
+            margin-top: 40px;
+        }
+        h3 {
+            color: #24292e;
+        }
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .definition {
+            background-color: #e1f0fa;
+            border-left: 5px solid #0366d6;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 5px 5px 0;
+        }
+        .warning {
+            background-color: #fff4e5;
+            border-left: 5px solid #f66a0a;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .code-container {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: Consolas, 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .yml-key { color: #9cdcfe; }
+        .yml-value { color: #ce9178; }
+        .yml-comment { color: #6a9955; font-style: italic; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🚀 Week 1: GitHub Actions & CI/CD Fundamentals</h1>
+    <p style="text-align: center; font-size: 1.1em;">Your complete revision notes, definitions, and code examples for Week 1.</p>
+
+    <div class="card">
+        <h2>1. What is CI/CD?</h2>
+        <div class="definition">
+            <strong>Continuous Integration (CI):</strong> The automated process of checking code out, installing dependencies, and running tests every time a developer pushes code. <br><br>
+            <strong>Continuous Deployment (CD):</strong> The automated process of taking that tested code and deploying it safely to a live server.
+        </div>
+        <p><strong>Real World Goal:</strong> Stop developers from manually pushing broken code to production. Let a robot (GitHub Actions) test it first!</p>
+    </div>
+
+    <div class="card">
+        <h2>2. The 5 Core Building Blocks</h2>
+        <table>
+            <tr>
+                <th>Block</th>
+                <th>YAML Keyword</th>
+                <th>Definition & Real World Meaning</th>
+            </tr>
+            <tr>
+                <td><strong>Workflow</strong></td>
+                <td><span style="font-family: monospace;">name:</span></td>
+                <td>The name of the entire automated pipeline file.</td>
+            </tr>
+            <tr>
+                <td><strong>Trigger</strong></td>
+                <td><span style="font-family: monospace;">on:</span></td>
+                <td>The "sensor" that wakes up the workflow (e.g., waiting for a push to the main branch).</td>
+            </tr>
+            <tr>
+                <td><strong>Jobs</strong></td>
+                <td><span style="font-family: monospace;">jobs:</span></td>
+                <td>The individual "workers". Each job runs on a totally separate computer.</td>
+            </tr>
+            <tr>
+                <td><strong>Runner</strong></td>
+                <td><span style="font-family: monospace;">runs-on:</span></td>
+                <td>Renting a fresh, blank computer from GitHub's servers (e.g., <code>ubuntu-latest</code>).</td>
+            </tr>
+            <tr>
+                <td><strong>Steps</strong></td>
+                <td><span style="font-family: monospace;">steps:</span></td>
+                <td>The chronological instruction manual we give to the blank computer.</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>3. Crucial Rules of YAML & CI/CD</h2>
+        
+        <div class="warning">
+            <strong>1. The Spacing Rule:</strong> YAML does not use brackets {}. It uses SPACES. Every time something is "inside" something else, it must be indented by exactly 2 spaces. If you mess up the spaces, the workflow crashes.
+        </div>
+        
+        <div class="warning">
+            <strong>2. Exit Codes (Quality Gates):</strong> GitHub decides if a step passed or failed by looking at terminal Exit Codes. <br>
+            <span class="badge" style="background-color: #28a745;">Exit Code 0</span> = Success. Pipeline continues.<br>
+            <span class="badge" style="background-color: #dc3545;">Exit Code 1</span> = Failure. Pipeline stops immediately and turns Red ❌.
+        </div>
+
+        <div class="warning">
+            <strong>3. No Infinite Loops:</strong> You can never run commands like <code>npm start</code> or <code>nodemon</code> in CI/CD. The terminal must finish its job and close. If it stays open forever, the server hangs and wastes compute minutes.
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>4. The Most Important Commands</h2>
+        
+        <h3>The Checkout Step</h3>
+        <p>Because GitHub gives us a 100% blank computer, we MUST tell it to download our code first. We do this using a pre-built action:</p>
+        <div class="code-container">
+<span class="yml-key">- uses:</span> <span class="yml-value">actions/checkout@v4</span>
+        </div>
+
+        <h3>Running Terminal Commands</h3>
+        <p>Use the <code>run:</code> keyword to type anything you would normally type in your own terminal. Use the pipe <code>|</code> symbol to run multiple lines of code.</p>
+        <div class="code-container">
+<span class="yml-key">- run:</span> |
+    echo "This is line 1"
+    npm install
+    npm test
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>5. Advanced Week 1 Concepts</h2>
+        
+        <h3>Multi-Job Pipelines (The "needs" keyword)</h3>
+        <div class="definition">
+            By default, GitHub runs all jobs at the exact same time to save time. The <strong>needs</strong> keyword acts like a traffic light, telling a job to WAIT for another job to finish successfully before it starts.
+        </div>
+        
+        <h3>Secrets & Passwords</h3>
+        <div class="definition">
+            Never type passwords in YAML. Store them securely in GitHub Repo Settings &rarr; Secrets. Pull them into the code using <code>${{ secrets.SECRET_NAME }}</code>. GitHub will mask them with <code>***</code> in logs.
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>6. The Ultimate Week 1 Master Pipeline</h2>
+        <p>Here is an example combining everything you learned:</p>
+        <div class="code-container">
+<span class="yml-key">name:</span> <span class="yml-value">Production Pipeline</span>
+
+<span class="yml-key">on:</span>
+  <span class="yml-key">push:</span>
+    <span class="yml-key">branches:</span>
+      <span class="yml-value">- main</span>  <span class="yml-comment"># Only wake up on main branch pushes</span>
+  <span class="yml-key">workflow_dispatch:</span>  <span class="yml-comment"># Adds manual run button</span>
+
+<span class="yml-key">jobs:</span>
+  <span class="yml-comment"># Job 1: Testing</span>
+  <span class="yml-key">test_job:</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Checkout Code</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/checkout@v4</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Run tests</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm test</span> <span class="yml-comment"># Will throw Exit Code 1 if it fails</span>
+
+  <span class="yml-comment"># Job 2: Deployment</span>
+  <span class="yml-key">deploy_job:</span>
+    <span class="yml-key">needs:</span> <span class="yml-value">test_job</span> <span class="yml-comment"># Wait for test_job to finish!</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Deploy with Secret</span>
+        <span class="yml-key">env:</span>
+          <span class="yml-key">PASSWORD:</span> <span class="yml-value">${{ secrets.MY_DB_PASS }}</span>
+        <span class="yml-key">run:</span> |
+          <span class="yml-value">echo "Deploying..."</span>
+          <span class="yml-value">echo "Using password: $PASSWORD"</span> <span class="yml-comment"># Shows as ***</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>7. YAML Copy-Paste Templates</h2>
+        <p>Use these templates for quick revision or to copy-paste into your future projects!</p>
+        
+        <h3>Template 1: Branch Filtering (Only run on main)</h3>
+        <p>Stops the pipeline from running when developers push to test branches.</p>
+        <div class="code-container">
+<span class="yml-key">on:</span>
+  <span class="yml-key">push:</span>
+    <span class="yml-key">branches:</span>
+      <span class="yml-value">- main</span>
+        </div>
+
+        <h3>Template 2: Path Filtering (Ignore README changes)</h3>
+        <p>Save compute time by NOT running tests if someone only changes a markdown file.</p>
+        <div class="code-container">
+<span class="yml-key">on:</span>
+  <span class="yml-key">push:</span>
+    <span class="yml-key">paths-ignore:</span>
+      <span class="yml-value">- '**.md'</span>
+        </div>
+
+        <h3>Template 3: Multi-Line Terminal Commands</h3>
+        <p>Use the pipe <code>|</code> symbol to run multiple terminal commands in one step.</p>
+        <div class="code-container">
+<span class="yml-key">steps:</span>
+  <span class="yml-key">- name:</span> <span class="yml-value">Install and Test</span>
+    <span class="yml-key">run:</span> |
+      <span class="yml-value">npm install</span>
+      <span class="yml-value">npm test</span>
+      <span class="yml-value">echo "All done!"</span>
+        </div>
+
+        <h3>Template 4: Using GitHub Secrets Safely</h3>
+        <p>Always load secrets into the <code>env</code> block first so GitHub can hide them.</p>
+        <div class="code-container">
+<span class="yml-key">steps:</span>
+  <span class="yml-key">- name:</span> <span class="yml-value">Login to Database</span>
+    <span class="yml-key">env:</span>
+      <span class="yml-key">DB_PASS:</span> <span class="yml-value">${{ secrets.DATABASE_PASSWORD }}</span>
+    <span class="yml-key">run:</span> |
+      <span class="yml-value">echo "Logging in..."</span>
+      <span class="yml-value">echo "Password is $DB_PASS"</span>
+        </div>
+        
+        <h3>Template 5: Setting up Node.js</h3>
+        <p>A very common step to prepare a Linux machine for a JavaScript project.</p>
+        <div class="code-container">
+<span class="yml-key">steps:</span>
+  <span class="yml-key">- name:</span> <span class="yml-value">Set up Node</span>
+    <span class="yml-key">uses:</span> <span class="yml-value">actions/setup-node@v4</span>
+    <span class="yml-key">with:</span>
+      <span class="yml-key">node-version:</span> <span class="yml-value">20</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>8. Your Completed Exercises (Week 1)</h2>
+        <p>Here is a record of the exact code you wrote and successfully ran to complete Week 1. Look at how much you advanced from Exercise 1 to Exercise 5!</p>
+
+        <h3>Exercise 1: Your First Action</h3>
+        <p>The simplest workflow. Triggered on push, rented a Linux machine, checked out code, and printed a message.</p>
+        <div class="code-container">
+<span class="yml-key">name:</span> <span class="yml-value">Exercise 1 - My First Action</span>
+<span class="yml-key">on:</span> <span class="yml-value">push</span>
+<span class="yml-key">jobs:</span>
+  <span class="yml-key">first_job:</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Step 1 - Get code</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/checkout@v4</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Step 2 - Say Hello</span>
+        <span class="yml-key">run:</span> <span class="yml-value">echo "Hello World from GitHub Actions!"</span>
+        </div>
+
+        <h3>Exercise 2: Path Filtering & Manual Triggers</h3>
+        <p>Added <code>workflow_dispatch</code> so we could click a button to run it, and ignored <code>.md</code> files.</p>
+        <div class="code-container">
+<span class="yml-key">name:</span> <span class="yml-value">Exercise 2 - Path filtering</span>
+<span class="yml-key">on:</span>
+  <span class="yml-key">push:</span>
+    <span class="yml-key">paths-ignore:</span>
+      <span class="yml-value">- '**.md'</span>
+  <span class="yml-key">workflow_dispatch:</span>
+<span class="yml-key">jobs:</span>
+  <span class="yml-key">second_job:</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- run:</span> <span class="yml-value">echo "I only run when code changes, not markdown!"</span>
+        </div>
+
+        <h3>Exercise 3: Quality Gates (Node.js Testing)</h3>
+        <p>Set up a Node.js environment, installed packages, and ran tests. If tests failed (Exit Code 1), the pipeline crashed.</p>
+        <div class="code-container">
+<span class="yml-key">name:</span> <span class="yml-value">Exercise 3 - Quality Gate</span>
+<span class="yml-key">on:</span> <span class="yml-value">push</span>
+<span class="yml-key">jobs:</span>
+  <span class="yml-key">run_quality_test:</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Step 1 - Checkout repository</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/checkout@v4</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Step 2 - Setup node js</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/setup-node@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">node-version:</span> <span class="yml-value">20</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Step 3 - Install dependency</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm ci</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Step 4 - Execute the unit test</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm test</span>
+        </div>
+
+        <h3>Exercise 4: Environment Variables & Secrets</h3>
+        <p>Learning how to store public variables (APP_NAME) and hide private passwords using GitHub Secrets.</p>
+        <div class="code-container">
+<span class="yml-key">name:</span> <span class="yml-value">Exercise 4 Environment Variables and Secrets</span>
+<span class="yml-key">on:</span>
+  <span class="yml-key">push:</span>
+    <span class="yml-key">branches:</span>
+      <span class="yml-value">- main</span>
+  <span class="yml-key">workflow_dispatch:</span>
+<span class="yml-key">jobs:</span>
+  <span class="yml-key">secrets_jobs:</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">env:</span>
+      <span class="yml-key">APP_NAME:</span> <span class="yml-value">"Github actions Learning APP"</span>
+      <span class="yml-key">APP_ENV:</span> <span class="yml-value">"staging"</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Step 1 - Checkout</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/checkout@v4</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Step 2 - use encrypt secret safely</span>
+        <span class="yml-key">env:</span>
+          <span class="yml-key">MY_SECRET:</span> <span class="yml-value">${{secrets.MY_API_KEY}}</span>
+        <span class="yml-key">run:</span> |
+          <span class="yml-value">echo "Connecting to external database"</span>
+          <span class="yml-value">echo "Secret Token value is: $MY_SECRET"</span>
+        </div>
+
+        <h3>Exercise 5: Multi-Job Pipelines (The Finale!)</h3>
+        <p>Using the <code>needs:</code> keyword to create a visual graph and stop the deploy job if the test job fails.</p>
+        <div class="code-container">
+<span class="yml-key">name:</span> <span class="yml-value">Exercise 5 - Multi-Job Pipelines</span>
+<span class="yml-key">on:</span>
+  <span class="yml-key">push:</span>
+    <span class="yml-key">branches:</span>
+      <span class="yml-value">- main</span>
+<span class="yml-key">jobs:</span>
+  <span class="yml-key">test_job:</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Run tests</span>
+        <span class="yml-key">run:</span> <span class="yml-value">echo "Tests passed! ✅"</span>
+
+  <span class="yml-key">deploy_job:</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">needs:</span> <span class="yml-value">test_job</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Deploy to production</span>
+        <span class="yml-key">run:</span> <span class="yml-value">echo "Deploying application to the server... 🚀"</span>
+        </div>
+    </div>
+
+</body>
+</html>
