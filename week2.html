@@ -136,5 +136,39 @@
         </div>
     </div>
 
+    <div class="card">
+        <h2>4. Docker in CI/CD (The Holy Grail)</h2>
+        <div class="definition">
+            <strong>What it is:</strong> A way to package your code, along with the entire operating system and all dependencies, into an indestructible "container" using a blueprint called a <code>Dockerfile</code>.
+        </div>
+        <p><strong>Real World Goal:</strong> If you run raw Node.js code on an AWS server, it might break because the server has the wrong Node version. If you hand AWS a Docker container, it is 100% guaranteed to run perfectly.</p>
+        
+        <h3>The Blueprint (Dockerfile)</h3>
+        <p>This file sits in the root of your project and tells Docker how to build the container.</p>
+        <div class="code-container">
+<span class="yml-comment"># Start with a computer that has Node 20</span>
+<span class="yml-key">FROM</span> <span class="yml-value">node:20-alpine</span>
+
+<span class="yml-comment"># Create a folder for our app</span>
+<span class="yml-key">WORKDIR</span> <span class="yml-value">/app</span>
+
+<span class="yml-comment"># Run a command to setup the code</span>
+<span class="yml-key">RUN</span> <span class="yml-value">echo "console.log('Running in Docker!');" > server.js</span>
+
+<span class="yml-comment"># Tell the container how to turn on</span>
+<span class="yml-key">CMD</span> <span class="yml-value">["node", "server.js"]</span>
+        </div>
+
+        <h3>YAML Template: Building it in GitHub Actions</h3>
+        <div class="code-container">
+<span class="yml-key">steps:</span>
+  <span class="yml-key">- name:</span> <span class="yml-value">Build the Docker Image</span>
+    <span class="yml-key">run:</span> <span class="yml-value">docker build -t my-backend-app .</span>
+    
+  <span class="yml-key">- name:</span> <span class="yml-value">Test the Docker Container</span>
+    <span class="yml-key">run:</span> <span class="yml-value">docker run my-backend-app</span>
+        </div>
+    </div>
+
 </body>
 </html>
