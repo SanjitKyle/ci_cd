@@ -1,0 +1,41 @@
+name: Exercise 7 - Build Artifacts
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  # Job 1: Build the package
+  build_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Create a fake backend package
+        run: |
+          echo "This is the compiled backend code ready for AWS" > backend-build.txt
+          echo "Package created!"
+
+      - name: Upload the Artifact to GitHub
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-backend-artifact   # We name it so we can find it later
+          path: backend-build.txt     # The exact file we want to upload
+
+  # Job 2: Deploy the package
+  deploy_job:
+    needs: build_job                  # Wait for build_job to finish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download the Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: my-backend-artifact   # Must match the name from Job 1 exactly
+
+      - name: Verify it was downloaded
+        run: |
+          echo "Look what I downloaded from Job 1:"
+          cat backend-build.txt

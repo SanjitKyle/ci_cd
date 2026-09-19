@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 2 CI/CD Master Notes</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #f4f7f6;
+        }
+        h1 {
+            text-align: center;
+            color: #24292e;
+            border-bottom: 2px solid #0366d6;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #0366d6;
+            margin-top: 40px;
+        }
+        h3 {
+            color: #24292e;
+        }
+        .card {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .definition {
+            background-color: #e1f0fa;
+            border-left: 5px solid #0366d6;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 5px 5px 0;
+        }
+        .code-container {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: Consolas, 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .yml-key { color: #9cdcfe; }
+        .yml-value { color: #ce9178; }
+        .yml-comment { color: #6a9955; font-style: italic; }
+    </style>
+</head>
+<body>
+
+    <h1>🚀 Week 2: Production Power & AWS Prep</h1>
+    <p style="text-align: center; font-size: 1.1em;">Your cheat sheet for Matrix Builds, Artifacts, Caching, and Docker.</p>
+
+    <div class="card">
+        <h2>1. The Matrix Strategy</h2>
+        <div class="definition">
+            <strong>What it is:</strong> A way to write <em>one</em> job in your YAML file, but have GitHub automatically run it multiple times across different environments (like different Node.js versions or Operating Systems) simultaneously.
+        </div>
+        <p><strong>Real World Goal:</strong> Prove your backend code works perfectly on Linux, Windows, and Mac before you deploy it.</p>
+        
+        <h3>YAML Template:</h3>
+        <div class="code-container">
+<span class="yml-key">jobs:</span>
+  <span class="yml-key">matrix_test:</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">strategy:</span>
+      <span class="yml-key">matrix:</span>
+        <span class="yml-key">node-version:</span> <span class="yml-value">[16, 18, 20]</span> <span class="yml-comment"># Test 3 versions at once!</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Setup Node</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/setup-node@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">node-version:</span> <span class="yml-value">${{ matrix.node-version }}</span> <span class="yml-comment"># Injects 16, 18, and 20 dynamically</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>2. Build Artifacts (Passing Files)</h2>
+        <div class="definition">
+            <strong>What it is:</strong> Because every job gets a completely blank computer, files created in Job 1 do not exist in Job 2. Artifacts allow you to upload a file (like a ZIP package) from Job 1, and download it into Job 2.
+        </div>
+        <p><strong>Real World Goal:</strong> When you deploy to AWS, you must hand AWS a packaged ZIP file of your code. Job 1 builds that ZIP, and Job 2 downloads it to send to AWS.</p>
+        
+        <h3>YAML Template:</h3>
+        <div class="code-container">
+<span class="yml-key">jobs:</span>
+  <span class="yml-key">build_job:</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Upload the Artifact</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/upload-artifact@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">name:</span> <span class="yml-value">my-backend-package</span> <span class="yml-comment"># Give it a name</span>
+          <span class="yml-key">path:</span> <span class="yml-value">backend-build.txt</span>    <span class="yml-comment"># The file you want to save</span>
+
+  <span class="yml-key">deploy_job:</span>
+    <span class="yml-key">needs:</span> <span class="yml-value">build_job</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Download the Artifact</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/download-artifact@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">name:</span> <span class="yml-value">my-backend-package</span> <span class="yml-comment"># Must match the uploaded name exactly</span>
+        </div>
+    </div>
+
+</body>
+</html>
