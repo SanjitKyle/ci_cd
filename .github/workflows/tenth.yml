@@ -1,0 +1,34 @@
+name: Exercise 10 - AWS Secure Login
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+# SECURITY UPGRADE: These permissions are absolutely required for Passwordless AWS Login
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy_to_aws:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # ---------------------------------------------------------
+      # REAL WORLD CODE (Commented out so our pipeline doesn't crash without a real AWS account)
+      # ---------------------------------------------------------
+      # - name: Login to AWS using OIDC
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with:
+      #     role-to-assume: arn:aws:iam::123456789012:role/MyGitHubActionsRole
+      #     aws-region: us-east-1
+
+      - name: Simulate AWS Login
+        run: |
+          echo "Logging into AWS US-East-1 region..."
+          echo "Using OIDC VIP Wristband. No passwords needed!"
+          echo "✅ AWS Connection Successful!"
