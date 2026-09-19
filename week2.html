@@ -113,5 +113,28 @@
         </div>
     </div>
 
+    <div class="card">
+        <h2>3. Caching & Optimization</h2>
+        <div class="definition">
+            <strong>What it is:</strong> GitHub Actions can save files (like downloaded packages or heavy folders) into a temporary "vault". The next time the pipeline runs, instead of downloading everything from the internet again, it just loads it instantly from the vault.
+        </div>
+        <p><strong>Real World Goal:</strong> Make pipelines run in 10 seconds instead of 5 minutes. This saves companies thousands of dollars in GitHub compute charges.</p>
+        
+        <h3>YAML Template:</h3>
+        <div class="code-container">
+<span class="yml-key">steps:</span>
+  <span class="yml-key">- name:</span> <span class="yml-value">Try to load Cache</span>
+    <span class="yml-key">uses:</span> <span class="yml-value">actions/cache@v4</span>
+    <span class="yml-key">id:</span> <span class="yml-value">my-cache</span>
+    <span class="yml-key">with:</span>
+      <span class="yml-key">path:</span> <span class="yml-value">node_modules</span>     <span class="yml-comment"># The heavy folder we want to save</span>
+      <span class="yml-key">key:</span> <span class="yml-value">my-project-cache-v1</span> <span class="yml-comment"># The unique password for this cache</span>
+
+  <span class="yml-key">- name:</span> <span class="yml-value">Install Dependencies (Cache Miss)</span>
+    <span class="yml-key">if:</span> <span class="yml-value">steps.my-cache.outputs.cache-hit != 'true'</span> <span class="yml-comment"># Only run if cache is NOT found</span>
+    <span class="yml-key">run:</span> <span class="yml-value">npm install</span>
+        </div>
+    </div>
+
 </body>
 </html>
