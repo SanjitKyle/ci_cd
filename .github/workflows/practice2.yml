@@ -19,4 +19,4 @@ jobs:
        MY_SECURE_PASSWORD: ${{secrets.MYTESTPASS}}
       run: |
        echo " The applicaiton is running in : $APP_ENV"
-       echo: "My super secrets password is : $MYTESTPASS"
+       echo "My super secrets password is : $MYTESTPASS"
