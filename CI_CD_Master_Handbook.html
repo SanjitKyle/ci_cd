@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CI/CD Master Handbook: Weeks 1 & 2</title>
+    <style>
+        :root {
+            --primary: #0366d6;
+            --bg-color: #f6f8fa;
+            --text-main: #24292e;
+            --code-bg: #1e1e1e;
+            --success: #28a745;
+            --warning: #ffd33d;
+            --danger: #d73a49;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+        .section-title {
+            background-color: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            margin-top: 50px;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            border: 1px solid #e1e4e8;
+        }
+        .deep-dive {
+            background-color: #f1f8ff;
+            border-left: 5px solid var(--primary);
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .pro-tip {
+            background-color: #dcffe4;
+            border-left: 5px solid var(--success);
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+        .real-world {
+            background-color: #fffbdd;
+            border-left: 5px solid var(--warning);
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+        .code-block {
+            background-color: var(--code-bg);
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .yml-key { color: #9cdcfe; }
+        .yml-value { color: #ce9178; }
+        .yml-comment { color: #6a9955; font-style: italic; }
+        .yml-keyword { color: #569cd6; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #e1e4e8;
+            padding: 12px;
+            text-align: left;
+        }
+        th { background-color: #f6f8fa; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>CI/CD Master Handbook</h1>
+        <p style="font-size: 1.2em; color: #586069;">In-Depth Guide to GitHub Actions: Weeks 1 & 2</p>
+    </div>
+
+    <!-- WEEK 1 -->
+    <h2 class="section-title">📘 WEEK 1: The Core Fundamentals</h2>
+
+    <div class="card">
+        <h3>1. The Anatomy of GitHub Actions</h3>
+        <p>A pipeline is built using strict YAML syntax (indentation using exactly 2 spaces). Understanding the hierarchy is the most important skill for a DevOps engineer.</p>
+        <table>
+            <tr><th>Component</th><th>Definition</th><th>Deep Dive Knowledge</th></tr>
+            <tr>
+                <td><strong>Trigger (<code>on:</code>)</strong></td>
+                <td>When the workflow runs.</td>
+                <td>You can filter triggers aggressively. <code>paths-ignore: '**.md'</code> prevents the pipeline from wasting compute time if a developer only updates the README.</td>
+            </tr>
+            <tr>
+                <td><strong>Runner (<code>runs-on:</code>)</strong></td>
+                <td>The virtual machine.</td>
+                <td>These are <em>ephemeral</em> (temporary) environments. When the job finishes, GitHub physically destroys the virtual machine. Nothing is saved permanently.</td>
+            </tr>
+            <tr>
+                <td><strong>Actions (<code>uses:</code>)</strong></td>
+                <td>Pre-packaged code.</td>
+                <td><code>actions/checkout@v4</code> is mandatory. Because the runner is a blank slate, this action securely clones your Git repository into the runner's memory so it can be tested.</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="card">
+        <h3>2. Quality Gates & Exit Codes</h3>
+        <div class="deep-dive">
+            <strong>The Underlying Mechanics:</strong> GitHub Actions does not actually know if your Node.js code is good or bad. It only listens to the Operating System's <strong>Exit Codes</strong>.
+            <br><br>
+            When you run <code>npm test</code>, if the tests pass, Node.js silently sends <strong>Exit Code 0</strong> to Linux. GitHub sees the 0 and paints the step Green ✅. If a test fails, Node.js sends <strong>Exit Code 1</strong>. GitHub sees the 1, immediately kills the runner, and paints the step Red ❌.
+        </div>
+        <div class="pro-tip">
+            <strong>Pro Tip:</strong> Never run background processes like <code>nodemon</code> or infinite server loops in CI/CD. The step will hang forever waiting for an Exit Code that never comes, wasting your company's money.
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>3. Managing Secrets & Environment Variables</h3>
+        <p>In production, you never hardcode passwords. You inject them dynamically.</p>
+        <div class="code-block">
+<span class="yml-key">env:</span>
+  <span class="yml-key">APP_NAME:</span> <span class="yml-value">"My Production App"</span> <span class="yml-comment"># Public variable</span>
+<span class="yml-key">steps:</span>
+  <span class="yml-key">- name:</span> <span class="yml-value">Login</span>
+    <span class="yml-key">env:</span>
+      <span class="yml-key">DB_PASS:</span> <span class="yml-value">${{ secrets.DB_PASSWORD }}</span> <span class="yml-comment"># Secure private variable</span>
+    <span class="yml-key">run:</span> <span class="yml-value">echo "Logging in with $DB_PASS"</span>
+        </div>
+        <div class="real-world">
+            <strong>Real World Context:</strong> When you use <code>${{ secrets... }}</code>, GitHub encrypts it. Even if you try to print it to the terminal using <code>echo</code>, GitHub intercepts the log and masks it as <code>***</code> so hackers cannot read your build logs.
+        </div>
+    </div>
+
+
+    <!-- WEEK 2 -->
+    <h2 class="section-title">🚀 WEEK 2: Optimization & Production Power</h2>
+
+    <div class="card">
+        <h3>4. The Matrix Strategy</h3>
+        <p>The Matrix allows you to run a single job across multiple configurations simultaneously.</p>
+        <div class="deep-dive">
+            <strong>Why depth matters here:</strong> A junior developer writes 3 different jobs to test Node 16, 18, and 20. A Senior developer writes 1 job using a Matrix. This keeps the YAML file DRY (Don't Repeat Yourself) and ensures all tests run in parallel, cutting test time by 66%.
+        </div>
+        <div class="code-block">
+<span class="yml-key">strategy:</span>
+  <span class="yml-key">matrix:</span>
+    <span class="yml-key">os:</span> <span class="yml-value">[ubuntu-latest, windows-latest]</span>
+    <span class="yml-key">node:</span> <span class="yml-value">[18, 20]</span>
+<span class="yml-comment"># This creates a 2x2 grid. GitHub will automatically spin up 4 computers to test every combination!</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>5. Ephemeral Storage & Artifacts</h3>
+        <p>Because runners are destroyed after a job finishes (Ephemeral Environments), files do not persist between Jobs.</p>
+        <div class="real-world">
+            <strong>The Problem:</strong> Job 1 (Build) compiles your code into a ZIP. Job 2 (Deploy) needs that ZIP. But Job 2 is running on a totally different computer!<br>
+            <strong>The Solution:</strong> <code>actions/upload-artifact</code> saves the ZIP to GitHub's permanent cloud storage. <code>actions/download-artifact</code> pulls it down into Job 2.
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>6. Pipeline Optimization (Caching)</h3>
+        <p>Caching saves heavy folders (like <code>node_modules</code>) so they don't have to be downloaded from the internet on every single run.</p>
+        <div class="deep-dive">
+            <strong>How Cache Keys actually work:</strong><br>
+            <code>key: node-cache-${{ hashFiles('package-lock.json') }}</code><br><br>
+            The <code>hashFiles</code> function reads your package-lock file and generates a unique string of gibberish (a hash). If you install a new NPM package, the lock file changes, the hash changes, and GitHub knows it needs to create a brand new cache! If the file hasn't changed, it instantly loads the old cache.
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>7. Docker Containerization (The Holy Grail)</h3>
+        <p>Docker is the industry standard for deploying backend code.</p>
+        <div class="real-world">
+            <strong>The "It works on my machine" Problem:</strong> You write code on a Windows laptop. It works perfectly. You deploy it to an AWS Linux server. It crashes because the server has the wrong Node.js version installed.<br><br>
+            <strong>The Docker Solution:</strong> A <code>Dockerfile</code> packages your code, Node.js, and a mini Linux Operating System into a single, indestructible box (a Container). Because the operating system is <em>inside</em> the box, it is 100% guaranteed to run exactly the same way on AWS as it did on your laptop.
+        </div>
+        <div class="code-block">
+<span class="yml-comment"># Build the box (reads the Dockerfile)</span>
+<span class="yml-keyword">docker</span> build -t my-app .
+
+<span class="yml-comment"># Turn the box on</span>
+<span class="yml-keyword">docker</span> run my-app
+        </div>
+    </div>
+
+    <!-- REAL WORLD TEMPLATES -->
+    <h2 class="section-title">📂 Real-World Production YAML Templates</h2>
+    <p>These are exact templates you would find in a real company's codebase for backend applications.</p>
+
+    <div class="card">
+        <h3>Template 1: The "Pull Request Checker" (Backend CI)</h3>
+        <p><strong>Scenario:</strong> You have a team of developers. Before anyone is allowed to merge their branch into <code>main</code>, this pipeline automatically runs to ensure they didn't break the backend tests or formatting.</p>
+        <div class="code-block">
+<span class="yml-key">name:</span> <span class="yml-value">Backend CI Quality Gate</span>
+
+<span class="yml-key">on:</span>
+  <span class="yml-key">pull_request:</span>
+    <span class="yml-key">branches:</span> <span class="yml-value">[ "main", "staging" ]</span>
+
+<span class="yml-key">jobs:</span>
+  <span class="yml-key">test_backend:</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Checkout Code</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/checkout@v4</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Setup Node.js</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/setup-node@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">node-version:</span> <span class="yml-value">'20'</span>
+          <span class="yml-key">cache:</span> <span class="yml-value">'npm'</span> <span class="yml-comment"># Modern 1-line caching!</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Install Dependencies</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm ci</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Check Code Formatting (Lint)</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm run lint</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Run Unit Tests</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm test</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Template 2: The "AWS Docker Deployer" (Backend CD)</h3>
+        <p><strong>Scenario:</strong> You just merged code into <code>main</code>. This pipeline tests the code, builds it into an indestructible Docker container, securely logs into AWS via OIDC, and uploads the container to AWS ECR.</p>
+        <div class="code-block">
+<span class="yml-key">name:</span> <span class="yml-value">Production AWS Deployment</span>
+
+<span class="yml-key">on:</span>
+  <span class="yml-key">push:</span>
+    <span class="yml-key">branches:</span> <span class="yml-value">[ "main" ]</span>
+
+<span class="yml-comment"># Required for OIDC passwordless AWS login</span>
+<span class="yml-key">permissions:</span>
+  <span class="yml-key">id-token:</span> <span class="yml-value">write</span>
+  <span class="yml-key">contents:</span> <span class="yml-value">read</span>
+
+<span class="yml-key">jobs:</span>
+  <span class="yml-key">build_and_deploy:</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Checkout Code</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/checkout@v4</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Run Backend Tests</span>
+        <span class="yml-key">run:</span> |
+          <span class="yml-value">npm ci</span>
+          <span class="yml-value">npm test</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Secure Login to AWS (OIDC)</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">aws-actions/configure-aws-credentials@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">role-to-assume:</span> <span class="yml-value">arn:aws:iam::123456789012:role/ProductionDeployRole</span>
+          <span class="yml-key">aws-region:</span> <span class="yml-value">us-east-1</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Login to Amazon ECR (Docker Vault)</span>
+        <span class="yml-key">id:</span> <span class="yml-value">login-ecr</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">aws-actions/amazon-ecr-login@v2</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Build, tag, and push Docker image to AWS</span>
+        <span class="yml-key">env:</span>
+          <span class="yml-key">ECR_REGISTRY:</span> <span class="yml-value">${{ steps.login-ecr.outputs.registry }}</span>
+          <span class="yml-key">ECR_REPOSITORY:</span> <span class="yml-value">my-backend-app</span>
+          <span class="yml-key">IMAGE_TAG:</span> <span class="yml-value">${{ github.sha }}</span> <span class="yml-comment"># Tags container with the Git commit ID</span>
+        <span class="yml-key">run:</span> |
+          <span class="yml-keyword">docker</span> <span class="yml-value">build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .</span>
+          <span class="yml-keyword">docker</span> <span class="yml-value">push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Template 3: "The Dental Clinic Backend" (Node.js + Database)</h3>
+        <p><strong>Scenario:</strong> You are building a Node.js backend for a Dental Clinic Management system. It handles patient appointments and billing. Because it is a real backend, you cannot test it without a database! This template shows how to use <strong>Service Containers</strong> to spin up a temporary PostgreSQL database just for your tests.</p>
+        <div class="code-block">
+<span class="yml-key">name:</span> <span class="yml-value">Dental Clinic Backend CI/CD</span>
+
+<span class="yml-key">on:</span>
+  <span class="yml-key">push:</span>
+    <span class="yml-key">branches:</span> <span class="yml-value">[ "main" ]</span>
+
+<span class="yml-key">jobs:</span>
+  <span class="yml-key">test_and_deploy:</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+
+    <span class="yml-comment"># ADVANCED REAL-WORLD FEATURE: Service Containers</span>
+    <span class="yml-comment"># This spins up a blank database next to our code for testing!</span>
+    <span class="yml-key">services:</span>
+      <span class="yml-key">postgres:</span>
+        <span class="yml-key">image:</span> <span class="yml-value">postgres:15</span>
+        <span class="yml-key">env:</span>
+          <span class="yml-key">POSTGRES_DB:</span> <span class="yml-value">clinic_test_db</span>
+          <span class="yml-key">POSTGRES_PASSWORD:</span> <span class="yml-value">supersecret</span>
+        <span class="yml-key">ports:</span>
+          <span class="yml-value">- 5432:5432</span>
+        <span class="yml-key">options:</span> <span class="yml-value">></span>
+          <span class="yml-value">--health-cmd pg_isready</span>
+          <span class="yml-value">--health-interval 10s</span>
+          <span class="yml-value">--health-timeout 5s</span>
+          <span class="yml-value">--health-retries 5</span>
+
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Checkout Clinic Code</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/checkout@v4</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Setup Node.js</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/setup-node@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">node-version:</span> <span class="yml-value">'20'</span>
+          <span class="yml-key">cache:</span> <span class="yml-value">'npm'</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Install NPM Dependencies</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm ci</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Run Database Migrations (Create Patient Tables)</span>
+        <span class="yml-key">env:</span>
+          <span class="yml-key">DATABASE_URL:</span> <span class="yml-value">postgres://postgres:supersecret@localhost:5432/clinic_test_db</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm run migrate</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Run Backend Integration Tests</span>
+        <span class="yml-key">env:</span>
+          <span class="yml-key">DATABASE_URL:</span> <span class="yml-value">postgres://postgres:supersecret@localhost:5432/clinic_test_db</span>
+          <span class="yml-key">JWT_SECRET:</span> <span class="yml-value">${{ secrets.TEST_JWT_SECRET }}</span> <span class="yml-comment"># For doctor login tests</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm test</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Build Docker Container for AWS</span>
+        <span class="yml-key">run:</span> |
+          <span class="yml-value">echo "Tests passed! Packaging the clinic app..."</span>
+          <span class="yml-keyword">docker</span> <span class="yml-value">build -t dental-clinic-backend .</span>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

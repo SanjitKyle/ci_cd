@@ -1,0 +1,20 @@
+name: Practice 1 
+on:
+ push:
+  branches:
+   - main
+
+ workflow_dispatch:
+jobs:
+  my_first_test:
+    runs-on: ubuntu-latest
+  steps:
+   - name: checkout repo
+     uses: actions/checkout@v4
+
+   - name: print
+     run: |
+      "Practice 1 is successfully deploy"
+     
+     
+ 
