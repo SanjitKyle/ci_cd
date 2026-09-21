@@ -14,7 +14,7 @@ jobs:
 
     - name: print
       run: |
-      "Practice 1 is successfully deploy"
+       "Practice 1 is successfully deploy"
      
      
  
