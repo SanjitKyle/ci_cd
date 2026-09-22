@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Home Setup Guide</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: #f6f8fa;
+            color: #24292e;
+            margin: 0;
+            padding: 40px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #d73a49;
+            text-align: center;
+            border-bottom: 2px solid #e1e4e8;
+            padding-bottom: 10px;
+        }
+        .step {
+            margin: 25px 0;
+            padding: 20px;
+            background-color: #f1f8ff;
+            border-left: 5px solid #0366d6;
+            border-radius: 4px;
+        }
+        .step h3 {
+            margin-top: 0;
+            color: #0366d6;
+        }
+        .copy-box {
+            background-color: #1b1f23;
+            color: #e1e4e8;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 16px;
+            display: inline-block;
+            margin: 10px 0;
+        }
+        .highlight {
+            font-weight: bold;
+            color: #d73a49;
+        }
+        .checkbox-list {
+            list-style: none;
+            padding: 0;
+        }
+        .checkbox-list li {
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+        .checkbox-list input {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🏠 Week 3: Home AWS Setup</h1>
+    <p style="font-size: 1.1em; text-align: center;">Follow this checklist when you get home to your personal AWS account!</p>
+
+    <div class="step">
+        <h3>Step 1: Login</h3>
+        <p>Log into your <strong>Personal AWS Root Account</strong> on your home computer.</p>
+    </div>
+
+    <div class="step">
+        <h3>Step 2: Navigate to IAM</h3>
+        <p>In the top search bar of AWS, type <span class="highlight">IAM</span> and click the first result to go to the Identity and Access Management dashboard.</p>
+    </div>
+
+    <div class="step">
+        <h3>Step 3: Add Identity Provider</h3>
+        <ul class="checkbox-list">
+            <li><input type="checkbox"> On the left-hand menu, click on <strong>Identity providers</strong>.</li>
+            <li><input type="checkbox"> Click the blue button in the top right that says <strong>Add provider</strong>.</li>
+            <li><input type="checkbox"> Select the <strong>OpenID Connect</strong> circle (Do NOT select SAML).</li>
+        </ul>
+    </div>
+
+    <div class="step">
+        <h3>Step 4: Fill in the Details</h3>
+        <p>Copy and paste these exact values into the boxes:</p>
+        
+        <strong>Provider URL:</strong><br>
+        <div class="copy-box">https://token.actions.githubusercontent.com</div>
+        <p><em>(Note: If AWS shows a button that says "Get thumbprint", click it!)</em></p>
+
+        <strong>Audience:</strong><br>
+        <div class="copy-box">sts.amazonaws.com</div>
+    </div>
+
+    <div class="step">
+        <h3>Step 5: Save</h3>
+        <p>Scroll to the bottom of the page and click the <strong>Add provider</strong> button.</p>
+    </div>
+
+    <h2 style="text-align: center; color: #28a745; margin-top: 40px;">✅ Done!</h2>
+    <p style="text-align: center; font-size: 1.1em;">Once you have clicked "Add provider", message me back and say: <strong>"I am ready for Phase 2"</strong>, and we will create the VIP Role for your backend!</p>
+
+</div>
+
+</body>
+</html>

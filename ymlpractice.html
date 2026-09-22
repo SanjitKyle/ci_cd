@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My YAML Practice Vault: Weeks 1 & 2</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            background-color: #0d1117;
+            color: #c9d1d9;
+            margin: 0;
+            padding: 40px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #58a6ff;
+            text-align: center;
+            border-bottom: 2px solid #30363d;
+            padding-bottom: 20px;
+        }
+        h2 {
+            color: #7ee787;
+            margin-top: 50px;
+            border-bottom: 1px solid #30363d;
+            padding-bottom: 10px;
+        }
+        .card {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        .card h3 {
+            color: #ff7b72;
+            margin-top: 0;
+        }
+        pre {
+            background-color: #010409;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            border: 1px solid #30363d;
+            color: #e6edf3;
+            font-family: Consolas, monospace;
+            line-height: 1.5;
+        }
+        .comment { color: #8b949e; font-style: italic; }
+        .keyword { color: #ff7b72; }
+        .string { color: #a5d6ff; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📚 My YAML Practice Vault</h1>
+    <p style="text-align: center;">A complete collection of every YAML file we wrote during Week 1 and Week 2.</p>
+
+    <!-- WEEK 1 -->
+    <h2>📘 WEEK 1: Fundamentals</h2>
+
+    <div class="card">
+        <h3>1. The Basic Workflow & Branch Filtering</h3>
+        <p>Triggering a job only when pushing to the main branch.</p>
+<pre>
+<span class="keyword">name:</span> Practice 1 - The Basics
+<span class="keyword">on:</span>
+  <span class="keyword">push:</span>
+    <span class="keyword">branches:</span>
+      - main
+  <span class="keyword">workflow_dispatch:</span>
+
+<span class="keyword">jobs:</span>
+  <span class="keyword">my_first_test:</span>
+    <span class="keyword">runs-on:</span> ubuntu-latest
+    <span class="keyword">steps:</span>
+      - <span class="keyword">name:</span> Checkout repo
+        <span class="keyword">uses:</span> actions/checkout@v4
+        
+      - <span class="keyword">name:</span> print
+        <span class="keyword">run:</span> |
+          echo <span class="string">"Practice 1 is successfully deployed"</span>
+</pre>
+    </div>
+
+    <div class="card">
+        <h3>2. Ignoring Paths (Saving Money)</h3>
+        <p>Telling GitHub NOT to run the pipeline if we only edit a specific file.</p>
+<pre>
+<span class="keyword">name:</span> Practice - Ignore Paths
+<span class="keyword">on:</span>
+  <span class="keyword">push:</span>
+    <span class="keyword">paths-ignore:</span>
+      - <span class="string">'**.md'</span>     <span class="comment"># Ignores all markdown files</span>
+      - <span class="string">'test.js'</span>   <span class="comment"># Ignores the specific test.js file</span>
+
+<span class="keyword">jobs:</span> 
+  <span class="keyword">ignore_test:</span>
+    <span class="keyword">runs-on:</span> ubuntu-latest
+    <span class="keyword">steps:</span> 
+      - <span class="keyword">run:</span> |
+          echo <span class="string">"This will not run if I only edit test.js!"</span>
+</pre>
+    </div>
+
+    <div class="card">
+        <h3>3. Environment Variables & Secure Secrets</h3>
+        <p>Passing public variables to a job, and secure passwords to a step.</p>
+<pre>
+<span class="keyword">name:</span> Practice 2 - Secrets
+<span class="keyword">on:</span> [<span class="keyword">workflow_dispatch</span>]
+
+<span class="keyword">jobs:</span>
+  <span class="keyword">practice_two:</span>
+    <span class="keyword">runs-on:</span> ubuntu-latest
+    <span class="keyword">env:</span>
+      APP_ENV: <span class="string">"Production"</span>
+    
+    <span class="keyword">steps:</span>
+      - <span class="keyword">name:</span> checkout repo
+        <span class="keyword">uses:</span> actions/checkout@v4
+        
+      - <span class="keyword">name:</span> Print variables and secrets
+        <span class="keyword">env:</span>
+          MY_SECURE_PASSWORD: ${{ secrets.MYTESTPASS }}
+        <span class="keyword">run:</span> |
+          echo <span class="string">"The application is running in : $APP_ENV"</span>
+          echo <span class="string">"My super secrets password is : $MY_SECURE_PASSWORD"</span>
+</pre>
+    </div>
+
+    <div class="card">
+        <h3>4. Multi-Job Pipelines & Exit Codes</h3>
+        <p>Connecting two jobs together, and watching one fail intentionally.</p>
+<pre>
+<span class="keyword">name:</span> Practice 3 & 4 - Multi Job & Quality Gate
+<span class="keyword">on:</span> [<span class="keyword">workflow_dispatch</span>]
+
+<span class="keyword">jobs:</span>
+  <span class="keyword">test_job:</span>
+    <span class="keyword">runs-on:</span> ubuntu-latest 
+    <span class="keyword">steps:</span>
+      - <span class="keyword">name:</span> Test the code
+        <span class="keyword">run:</span> |
+          echo <span class="string">"Testing code..."</span>
+          exit 1   <span class="comment"># This crashes the job intentionally!</span>
+
+  <span class="keyword">deploy_job:</span>
+    <span class="keyword">runs-on:</span> ubuntu-latest
+    <span class="keyword">needs:</span> test_job  <span class="comment"># This job will be CANCELLED because test_job crashed</span>
+    <span class="keyword">steps:</span>
+      - <span class="keyword">name:</span> Deploy the application 
+        <span class="keyword">run:</span> |
+          echo <span class="string">"The application is deployed successfully"</span>
+</pre>
+    </div>
+
+
+    <!-- WEEK 2 -->
+    <h2>🚀 WEEK 2: Production Optimization</h2>
+
+    <div class="card">
+        <h3>5. The Matrix Strategy</h3>
+        <p>Testing multiple versions of Node.js simultaneously.</p>
+<pre>
+<span class="keyword">name:</span> Week 2 Practice 1 - Matrix 
+<span class="keyword">on:</span> [<span class="keyword">workflow_dispatch</span>]
+
+<span class="keyword">jobs:</span>
+  <span class="keyword">test_multiple_version:</span>
+    <span class="keyword">runs-on:</span> ubuntu-latest
+    <span class="keyword">strategy:</span>
+      <span class="keyword">matrix:</span>
+        node_version: [18, 20, 22]
+
+    <span class="keyword">steps:</span>
+      - <span class="keyword">name:</span> Setup node js 
+        <span class="keyword">uses:</span> actions/setup-node@v4
+        <span class="keyword">with:</span>
+          node-version: ${{ matrix.node_version }}
+          
+      - <span class="keyword">name:</span> Print Version
+        <span class="keyword">run:</span> |
+          echo <span class="string">"Testing node js version ${{ matrix.node_version }}"</span>
+          node -v 
+</pre>
+    </div>
+
+    <div class="card">
+        <h3>6. Build Artifacts</h3>
+        <p>Teleporting a file from Job 1 to Job 2 using Cloud Storage.</p>
+<pre>
+<span class="keyword">name:</span> Week 2 Practice 2 - Artifacts
+<span class="keyword">on:</span> [<span class="keyword">workflow_dispatch</span>]
+
+<span class="keyword">jobs:</span>
+  <span class="keyword">build_job:</span>
+    <span class="keyword">runs-on:</span> ubuntu-latest
+    <span class="keyword">steps:</span>
+      - <span class="keyword">run:</span> echo <span class="string">"My production backend code!"</span> > backend.txt
+          
+      - <span class="keyword">name:</span> Upload Artifact
+        <span class="keyword">uses:</span> actions/upload-artifact@v4
+        <span class="keyword">with:</span>
+          name: my-package
+          path: backend.txt
+
+  <span class="keyword">deploy_job:</span>
+    <span class="keyword">needs:</span> build_job
+    <span class="keyword">runs-on:</span> ubuntu-latest
+    <span class="keyword">steps:</span>
+      - <span class="keyword">name:</span> Download Artifact
+        <span class="keyword">uses:</span> actions/download-artifact@v4
+        <span class="keyword">with:</span>
+          name: my-package
+          
+      - <span class="keyword">run:</span> cat backend.txt
+</pre>
+    </div>
+
+    <div class="card">
+        <h3>7. Manual Caching</h3>
+        <p>Saving a specific folder manually so we don't have to download it twice.</p>
+<pre>
+<span class="keyword">name:</span> Week 2 Practice 3 - Caching 
+<span class="keyword">on:</span> [<span class="keyword">workflow_dispatch</span>]
+
+<span class="keyword">jobs:</span>
+  <span class="keyword">caching_job:</span>
+    <span class="keyword">runs-on:</span> ubuntu-latest 
+    <span class="keyword">steps:</span>
+      - <span class="keyword">name:</span> Try to load cache 
+        <span class="keyword">uses:</span> actions/cache@v4
+        <span class="keyword">id:</span> vault_check 
+        <span class="keyword">with:</span>
+          path: <span class="string">'src'</span>
+          key: my-cache-v1
+
+      - <span class="keyword">name:</span> Simulate downloading (cache miss)
+        <span class="keyword">if:</span> steps.vault_check.outputs.cache-hit != 'true'
+        <span class="keyword">run:</span> |
+          echo <span class="string">"Cache not found! Doing a heavy downloading"</span>
+          sleep 10
+          mkdir -p src
+          echo <span class="string">"Downloaded data"</span> > src/data.txt
+</pre>
+    </div>
+
+    <div class="card">
+        <h3>8. Real-World Built-in Caching</h3>
+        <p>The Senior way to cache node_modules automatically in 1 line of code.</p>
+<pre>
+<span class="keyword">name:</span> Real World Built-in Cache
+<span class="keyword">on:</span> [<span class="keyword">workflow_dispatch</span>]
+
+<span class="keyword">jobs:</span>
+  <span class="keyword">build_backend:</span>
+    <span class="keyword">runs-on:</span> ubuntu-latest
+    <span class="keyword">steps:</span>
+      - <span class="keyword">name:</span> Checkout Code
+        <span class="keyword">uses:</span> actions/checkout@v4
+
+      - <span class="keyword">name:</span> Setup Node.js & Automatically Cache node_modules
+        <span class="keyword">uses:</span> actions/setup-node@v4
+        <span class="keyword">with:</span>
+          node-version: <span class="string">'20'</span>
+          cache: <span class="string">'npm'</span>  <span class="comment"># The magic shortcut!</span>
+
+      - <span class="keyword">name:</span> Install Real Dependencies
+        <span class="keyword">run:</span> npm install
+</pre>
+    </div>
+
+</div>
+</body>
+</html>
