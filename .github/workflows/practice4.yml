@@ -1,0 +1,14 @@
+name: Practice 4 
+on:
+ push:
+  path-ignore:
+  - 'test.js'
+
+jobs: 
+ ignore_test:
+   runs-on: ubuntu-latest
+
+   steps: 
+    -run : |
+         echo "Ignoring path"
+   
