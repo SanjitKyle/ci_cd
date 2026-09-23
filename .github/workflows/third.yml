@@ -1,0 +1,22 @@
+name: practice 2 - secrets 
+on:
+  push:
+  
+  workflow_dispatch:
+
+jobs:
+  practice_two:
+    runs-on: ubuntu-latest
+    env: 
+     APP_ENV: "Production"
+
+    steps:
+      - name: checkout repo
+        uses: actions/checkout@v4
+      
+      - name : Print variables and secrets
+        env: 
+          MY_SECURE_PASSWORD : ${{secrets.MYSECRET}}
+        run: |
+           echo "the application is running in : $APP_ENV "
+           echo " My super secret password is :$MYSECRET"

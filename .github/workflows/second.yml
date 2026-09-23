@@ -9,5 +9,5 @@ jobs:
     runs-on: ubuntu-latest
   steps:
    - run: |
-        echo "This will not run if i only edit test.js"
+          echo "This will not run if i only edit test.js"
  
