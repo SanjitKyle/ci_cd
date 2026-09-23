@@ -1,0 +1,23 @@
+name: Practice 3 & 4 - Multi job & quality gate
+on:
+ workflow_dispatch:
+
+jobs:
+  test_jobs:
+    runs-on: ubuntu-latest 
+    steps:
+      - name : Test the code 
+        run: |
+           echo "Testing code ..."
+           exit 1 
+      
+    
+  deploy_test:
+    runs-on: ubuntu-latest
+    needs: test_jobs
+
+    steps:
+     - name : Deploy the application 
+       run : |
+            echo " The application is deploy successfully "
+   
