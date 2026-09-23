@@ -1,0 +1,13 @@
+name: Practice -Ignore Paths 
+on:
+  push:
+    path-ignore:
+      - 'test.js'
+  
+jobs:
+  ignore_test:
+    runs-on: ubuntu-latest
+  steps:
+   - run: |
+        echo "This will not run if i only edit test.js"
+ 
