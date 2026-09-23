@@ -8,7 +8,7 @@ jobs:
   practice_two:
     runs-on: ubuntu-latest
     env: 
-     APP_ENV: "Production"
+      APP_ENV: "Production"
 
     steps:
       - name: checkout repo
@@ -19,4 +19,4 @@ jobs:
           MY_SECURE_PASSWORD : ${{secrets.MYSECRET}}
         run: |
            echo "the application is running in : $APP_ENV "
-           echo " My super secret password is :$MYSECRET"
+           echo " My super secret password is :$MY_SECURE_PASSWORD"
