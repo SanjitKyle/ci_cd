@@ -1,0 +1,16 @@
+name:
+on:
+  push:
+    branches:
+     - main 
+  
+jobs:
+  my_first_test:
+     runs-on: ubuntu-latest 
+     steps:
+      - name: Checkout Repo 
+        uses: actions/checkout@v4
+
+      - name: Print 
+        run: |
+           echo "practice 1 is successfully deployed"
