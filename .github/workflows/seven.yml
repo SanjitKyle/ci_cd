@@ -1,0 +1,83 @@
+# name: Real Backend CI/CD Pipeline
+# on:
+#   push:
+#     branches: [main]
+
+# jobs:
+#   build_job:
+#   runs-on: ubuntu-latest
+#   steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v4       # download source code
+
+#     - name: Install dependencies
+#       run: npm ci                      # install node_modules
+
+#     - name: Run tests
+#       run: npm test                    # quality gate ✅
+
+#     - name: Zip the project           # package EVERYTHING
+#       run: zip -r my-backend.zip . -x "*.git*"
+#       #                            ↑ zip all files, ignore .git folder
+
+#     - name: Upload artifact
+#       uses: actions/upload-artifact@v4
+#       with:
+#         name: backend-package
+#         path: my-backend.zip   
+              
+#   deploy_job:
+#     needs: build_job                      # only runs if build passed!
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Download build artifact
+#         uses: actions/download-artifact@v4
+#         with:
+#           name: backend-package           # download the ZIP
+
+#       - name: Deploy to AWS
+#         run: |
+#           echo "Sending my-backend.zip to AWS server..."
+#           # real AWS commands go here (Week 3!)
+
+
+name: Real node js deloy
+
+on: 
+  push:
+    branches:
+      - main 
+
+jobs:
+  build_job:
+    runs-on: ubuntu-latest
+
+  steps:
+   - name: Checkout code 
+     uses: actions/checkout@v4
+
+   - name : Install code 
+     run: npm ci 
+   - name : run the test
+     run : npm test 
+   - name: zip the code 
+     run: zip -r mybackend.zip . -x "*.git"
+   - name: upload the artifacts
+     uses: actions/upload-artifacts@v4
+     with:
+      name: backend-package 
+      path: mybackend.zip
+  deploy_job:
+    needs: build_job
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download the artifact
+        uses: actions/download-artifact@v4
+        with: 
+         name : backend-package 
+
+      - name: Deploye to aws 
+        run: |
+           echo "Successfully deploy to aws "
+
+     
