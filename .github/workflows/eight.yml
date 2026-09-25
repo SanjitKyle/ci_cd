@@ -21,3 +21,9 @@ jobs:
 
      - name: install the dependency 
        run: npm install 
+
+
+
+
+
+"You join a new company. Their GitHub Actions pipeline is taking 8 minutes to run every time someone pushes code. A senior dev tells you npm install is the bottleneck. How do you fix this? Write the exact YAML steps."

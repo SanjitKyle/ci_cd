@@ -1,13 +1,44 @@
-name: Practice -Ignore Paths 
+name: build the job and deploy
 on:
   push:
-    path-ignore:
-      - 'test.js'
-  
+    branches:
+      - main 
+
+  workflow_dispatch:
+
 jobs:
-  ignore_test:
-    runs-on: ubuntu-latest
-  steps:
-   - run: |
-          echo "This will not run if i only edit test.js"
- 
+  build_jobs:
+    runs-on: ubuntu-latest 
+    steps: 
+     - name: checkout the code 
+       uses: actions/checkout@v4
+     - name: setupnode js
+       uses: actions/setup-node@v4
+       with:
+        node-version: '20'
+
+     - name : install the dependency 
+       run : npm ci 
+     - name : run the code 
+       run : npm test 
+     - name : upload the artifacts 
+       uses: actions/upload-artifact@v4
+       with:
+         name: mybackend
+         path: "src"
+  
+  deploy_jobs:
+    needs: build_jobs
+    runs-on : ubuntu-latest 
+    steps:
+      - name : Download artifacts 
+        uses: actions/download-artifact@v4
+        with: 
+          name: mybackend
+    
+      - run : cat mybackend
+        
+    
+
+
+      

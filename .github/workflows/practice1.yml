@@ -1,0 +1,27 @@
+name: practice 1
+on:
+  push:
+    branches:
+      - main 
+
+  workflow_dispatch:
+
+jobs:
+  test_jobs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name : checkout the code
+        uses: actions/checkout@v4
+
+      - name : Set up the node js 
+        uses: actions/setupnode@v4
+        with:
+         node-version: '20'
+
+      - name : Install dependency 
+        run: npm ci 
+
+      - name : run the test 
+        run : npm test
+         
