@@ -1,0 +1,31 @@
+name: build artifacts 
+on:
+ workflow_dispatch:
+
+jobs:
+  build_job:
+    runs-on: ubuntu-latest 
+
+    steps:
+     - name : checkout the code
+       uses: actions/checkout@v4
+
+     - name : zip the code 
+       run: zip -r release.zip . -x "*.git*"  
+     - name : upload the artifacts 
+       uses: actions/upload-artifact@v4
+       with:
+        name: prod-build
+        path: release.zip 
+
+  deploy_job:
+    needs: build_job
+    runs-on: ubuntu-latest 
+    steps:
+      - name : Download the code 
+        uses: actions/download-artifact@v4
+        with:
+         name: prod-build
+
+        run: echo " Artifact downloaded and verified ready for deployment!"
+       

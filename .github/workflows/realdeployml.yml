@@ -1,0 +1,82 @@
+name: Real Node.js Backend CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  # ─────────────────────────────────────
+  # JOB 1: Test the code (Quality Gate)
+  # ─────────────────────────────────────
+  test_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js with cache
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'              # caches node_modules — faster runs
+
+      - name: Install dependencies
+        run: npm ci                 # faster + safer than npm install
+
+      - name: Run tests
+        run: npm test               # Exit Code 1 = pipeline stops here!
+
+  # ─────────────────────────────────────
+  # JOB 2: Build & Package (only if tests pass)
+  # ─────────────────────────────────────
+  build_job:
+    needs: test_job                 # waits for tests to pass first!
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Zip the backend code
+        run: zip -r backend.zip . -x "*.git*" -x "node_modules/*"
+        # exclude .git and node_modules — AWS will install fresh
+
+      - name: Upload ZIP as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-package
+          path: backend.zip         # saved to GitHub vault
+
+  # ─────────────────────────────────────
+  # JOB 3: Deploy to AWS (only if build passes)
+  # ─────────────────────────────────────
+  deploy_job:
+    needs: build_job                # waits for ZIP to be ready
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download ZIP artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-package     # must match upload name exactly!
+
+      - name: Deploy to AWS
+        env:
+          AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          echo "Deploying backend.zip to AWS..."
+          echo "Using region: $AWS_REGION"
+          # Real AWS CLI commands go here (Week 3!)
+          # aws s3 cp backend.zip s3://my-bucket/
+          # aws elasticbeanstalk create-application-version ...

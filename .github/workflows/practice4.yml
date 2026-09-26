@@ -1,0 +1,20 @@
+name: practice 4 
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  cached_job:
+    runs-on: ubuntu-latest 
+    steps:
+      - name : checkout code 
+        uses: actions/checkout@v4
+
+      - name : Setup the node js 
+        uses: actions/setup-node@v4
+        with:
+         node-version: '20'
+         cache: 'npm'
+      - name : install the dependency
+        run : npm ci 

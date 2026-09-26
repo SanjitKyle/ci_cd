@@ -170,5 +170,110 @@
         </div>
     </div>
 
+    <div class="card">
+        <h2>5. Real Node.js Backend CI/CD Pipeline</h2>
+        <div class="definition">
+            <strong>What it is:</strong> A complete 3-job production pipeline that tests your code, packages it into a ZIP, and deploys it to AWS — in that exact order. If any job fails, the rest are automatically skipped.
+        </div>
+        <p><strong>Real World Goal:</strong> Push code to main → tests run → ZIP is built → ZIP is sent to AWS. Broken code is <strong>never</strong> deployed.</p>
+
+        <h3>Pipeline Flow:</h3>
+        <p style="font-family: monospace; background:#1e1e1e; color:#6a9955; padding:12px; border-radius:6px;">
+            Push to main → test_job (npm test) → build_job (zip + upload) → deploy_job (download + AWS)
+            <br><br>
+            If test_job FAILS → build_job SKIPPED → deploy_job SKIPPED 🛑
+        </p>
+
+        <h3>Key Decisions Explained:</h3>
+        <table style="width:100%; border-collapse:collapse; margin-top:10px;">
+            <tr><th style="border:1px solid #ddd; padding:10px; background:#f8f9fa;">Decision</th><th style="border:1px solid #ddd; padding:10px; background:#f8f9fa;">Why</th></tr>
+            <tr><td style="border:1px solid #ddd; padding:10px;"><code>npm ci</code> not <code>npm install</code></td><td style="border:1px solid #ddd; padding:10px;">Faster + uses exact package-lock.json</td></tr>
+            <tr><td style="border:1px solid #ddd; padding:10px;"><code>cache: 'npm'</code></td><td style="border:1px solid #ddd; padding:10px;">Saves 3–5 mins on every run</td></tr>
+            <tr><td style="border:1px solid #ddd; padding:10px;">Exclude <code>node_modules</code> from ZIP</td><td style="border:1px solid #ddd; padding:10px;">AWS installs fresh — smaller ZIP file</td></tr>
+            <tr><td style="border:1px solid #ddd; padding:10px;">Secrets for AWS keys</td><td style="border:1px solid #ddd; padding:10px;">Never hardcode credentials in YAML!</td></tr>
+            <tr><td style="border:1px solid #ddd; padding:10px;">3 separate jobs with <code>needs:</code></td><td style="border:1px solid #ddd; padding:10px;">Tests fail → code never reaches AWS</td></tr>
+        </table>
+
+        <h3>Full YAML Template:</h3>
+        <div class="code-container">
+<span class="yml-key">name:</span> <span class="yml-value">Real Node.js Backend CI/CD</span>
+
+<span class="yml-key">on:</span>
+  <span class="yml-key">push:</span>
+    <span class="yml-key">branches:</span>
+      <span class="yml-value">- main</span>
+  <span class="yml-key">workflow_dispatch:</span>
+
+<span class="yml-key">jobs:</span>
+
+  <span class="yml-comment"># JOB 1: Test the code (Quality Gate)</span>
+  <span class="yml-key">test_job:</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Checkout code</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/checkout@v4</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Setup Node.js with cache</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/setup-node@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">node-version:</span> <span class="yml-value">'20'</span>
+          <span class="yml-key">cache:</span> <span class="yml-value">'npm'</span> <span class="yml-comment"># caches node_modules — faster runs</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Install dependencies</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm ci</span> <span class="yml-comment"># faster + safer than npm install</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Run tests</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm test</span> <span class="yml-comment"># Exit Code 1 = pipeline stops here!</span>
+
+  <span class="yml-comment"># JOB 2: Build & Package (only if tests pass)</span>
+  <span class="yml-key">build_job:</span>
+    <span class="yml-key">needs:</span> <span class="yml-value">test_job</span> <span class="yml-comment"># waits for tests to pass first!</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Checkout code</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/checkout@v4</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Setup Node.js</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/setup-node@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">node-version:</span> <span class="yml-value">'20'</span>
+          <span class="yml-key">cache:</span> <span class="yml-value">'npm'</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Install dependencies</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm ci</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Zip the backend code</span>
+        <span class="yml-key">run:</span> <span class="yml-value">zip -r backend.zip . -x "*.git*" -x "node_modules/*"</span>
+        <span class="yml-comment"># exclude .git and node_modules — AWS installs fresh</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Upload ZIP as artifact</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/upload-artifact@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">name:</span> <span class="yml-value">backend-package</span>
+          <span class="yml-key">path:</span> <span class="yml-value">backend.zip</span> <span class="yml-comment"># saved to GitHub vault</span>
+
+  <span class="yml-comment"># JOB 3: Deploy to AWS (only if build passes)</span>
+  <span class="yml-key">deploy_job:</span>
+    <span class="yml-key">needs:</span> <span class="yml-value">build_job</span> <span class="yml-comment"># waits for ZIP to be ready</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Download ZIP artifact</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/download-artifact@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">name:</span> <span class="yml-value">backend-package</span> <span class="yml-comment"># must match upload name exactly!</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Deploy to AWS</span>
+        <span class="yml-key">env:</span>
+          <span class="yml-key">AWS_ACCESS_KEY:</span> <span class="yml-value">${{ secrets.AWS_ACCESS_KEY_ID }}</span>
+          <span class="yml-key">AWS_SECRET_KEY:</span> <span class="yml-value">${{ secrets.AWS_SECRET_ACCESS_KEY }}</span>
+          <span class="yml-key">AWS_REGION:</span> <span class="yml-value">${{ secrets.AWS_REGION }}</span>
+        <span class="yml-key">run:</span> |
+          <span class="yml-value">echo "Deploying backend.zip to AWS..."</span>
+          <span class="yml-value">echo "Using region: $AWS_REGION"</span>
+          <span class="yml-comment"># Real AWS CLI commands go here (Week 3!)</span>
+          <span class="yml-comment"># aws s3 cp backend.zip s3://my-bucket/</span>
+        </div>
+    </div>
+
 </body>
 </html>
