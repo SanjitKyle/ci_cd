@@ -1,0 +1,76 @@
+name: complete revision 
+on:
+  push: 
+    branches:
+      - main 
+
+  workflow_dispatch:
+
+jobs:
+  testmatrix:
+    runs-on : ubuntu-latest
+
+    strategy:
+       matrix:
+         node_version: [18,20]
+
+    steps:
+       - name : checkout the code
+         uses: actions/checkout@v4
+
+       - name : setup node js 
+         uses: actions/setup-node@v4
+         with:
+           node-version: ${{matrix.node_version}}
+           cache: 'npm'
+
+       - name : install the dependency 
+         run: npm ci 
+
+       - name : run the test 
+         run : npm test 
+
+  build_and_package:
+     needs: testmatrix
+     runs-on: ubuntu-latest 
+
+     steps:
+        - name : checkout the code 
+          uses: actions/checkout@v4
+
+        - name : zip the code 
+          run: zip -r backend.zip . -x "*.git*" 
+
+        - name : upload the zip file 
+          uses: actions/upload-artifact@v4
+          with:
+             name : app-package
+             path: backend.zip
+
+  deploy_staging:
+    needs: build_and_package
+    runs-on: ubuntu-latest
+    env:
+        APP_ENV: 'Production'
+    steps:
+      - name : dowload the zip file 
+        uses: actions/download-artifact@v4
+        with:
+           name : app-package
+
+      - name: secret key use
+
+        env: 
+           DEPLOY_KEY : ${{secrets.API_SECRET}}
+
+        run : |
+           echo " Deploying package with key: $DEPLOY_KEY"
+
+        
+
+        
+
+
+
+             
+

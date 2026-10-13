@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 3 CI/CD Master Notes: AWS & OIDC</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #f4f7f6;
+        }
+        h1 {
+            text-align: center;
+            color: #24292e;
+            border-bottom: 3px solid #ff9900;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #232f3e;
+            margin-top: 30px;
+            border-left: 4px solid #ff9900;
+            padding-left: 10px;
+        }
+        h3 {
+            color: #0366d6;
+        }
+        .card {
+            background: #fff;
+            padding: 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+        .definition {
+            background-color: #e1f0fa;
+            border-left: 5px solid #0366d6;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 6px 6px 0;
+        }
+        .success-box {
+            background-color: #e6ffed;
+            border-left: 5px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .warning-box {
+            background-color: #fffbdd;
+            border-left: 5px solid #d97706;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 6px 6px 0;
+        }
+        .code-container {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 18px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: Consolas, 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .yml-key { color: #9cdcfe; }
+        .yml-value { color: #ce9178; }
+        .yml-comment { color: #6a9955; font-style: italic; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+        .badge {
+            display: inline-block;
+            background: #ff9900;
+            color: #111;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>☁️ Week 3: Cloud Deployment to AWS with OIDC</h1>
+    <p style="text-align: center; font-size: 1.1em;">Everything learned and configured for AWS OpenID Connect (Keyless Authentication) & S3 Deployments.</p>
+
+    <div class="card">
+        <h2>1. Why OIDC Instead of Static Access Keys?</h2>
+        <div class="definition">
+            <strong>OpenID Connect (OIDC):</strong> An industry-standard authentication protocol that lets GitHub Actions securely request short-lived temporary security tokens directly from AWS Security Token Service (STS) without saving any permanent passwords in GitHub Secrets.
+        </div>
+
+        <table>
+            <tr>
+                <th>Feature</th>
+                <th>❌ Static Keys (Old Approach)</th>
+                <th>🏆 OIDC with IAM Role (Production Standard)</th>
+            </tr>
+            <tr>
+                <td><strong>Secrets in GitHub</strong></td>
+                <td>Permanent Access Key ID & Secret Access Key</td>
+                <td><strong>Zero static keys!</strong> Only the IAM Role ARN</td>
+            </tr>
+            <tr>
+                <td><strong>Token Life</strong></td>
+                <td>Infinite (dangerous if leaked)</td>
+                <td>Temporary (auto-expires in 15 to 60 mins)</td>
+            </tr>
+            <tr>
+                <td><strong>Security Boundaries</strong></td>
+                <td>Whoever has keys can access AWS</td>
+                <td>Restricted strictly to repository <code>SanjitKyle/ci_cd</code> & branch <code>main</code></td>
+            </tr>
+            <tr>
+                <td><strong>Maintenance</strong></td>
+                <td>Manual 90-day key rotation required</td>
+                <td>Zero maintenance, automated rotation</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2>2. Exactly What We Configured in AWS Console</h2>
+        <p>The exact steps completed to set up our AWS infrastructure:</p>
+
+        <div class="success-box">
+            <h3>Phase 1: Added GitHub as OIDC Identity Provider</h3>
+            <ul>
+                <li>Navigated to <strong>IAM ➔ Identity providers ➔ Add provider</strong>.</li>
+                <li>Selected <strong>OpenID Connect</strong>.</li>
+                <li>Provider URL: <code>https://token.actions.githubusercontent.com</code> (clicked <em>Get thumbprint</em>).</li>
+                <li>Audience: <code>sts.amazonaws.com</code>.</li>
+                <li>Created ARN: <code>arn:aws:iam::194722438900:oidc-provider/token.actions.githubusercontent.com</code>.</li>
+            </ul>
+        </div>
+
+        <div class="success-box">
+            <h3>Phase 2: Created IAM Role (<code>GitHubActions-S3-DeployRole</code>)</h3>
+            <ul>
+                <li>Navigated to <strong>IAM ➔ Roles ➔ Create role</strong>.</li>
+                <li>Trusted entity type: <strong>Web identity</strong>.</li>
+                <li>Identity provider: <code>token.actions.githubusercontent.com</code> | Audience: <code>sts.amazonaws.com</code>.</li>
+                <li>Restricted to: GitHub Organization/Username: <code>SanjitKyle</code>, Repository: <code>ci_cd</code>, Branch: <code>main</code>.</li>
+                <li>Attached Permission Policy: <strong><code>AmazonS3FullAccess</code></strong>.</li>
+                <li>Role ARN: <code>arn:aws:iam::194722438900:role/GitHubActions-S3-DeployRole</code>.</li>
+            </ul>
+        </div>
+
+        <div class="success-box">
+            <h3>Phase 3: S3 Storage Bucket</h3>
+            <ul>
+                <li>Created globally unique S3 bucket (e.g., <code>sanjit-backend-deployments-2026</code>).</li>
+                <li>Region: <code>ap-south-1</code> (Mumbai) / <code>us-east-1</code> (N. Virginia).</li>
+                <li>Kept Block Public Access enabled for secure storage of zip builds.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>3. Crucial Rules for OIDC YAML Workflows</h2>
+        
+        <div class="warning-box">
+            <strong>Rule 1: Always add the OIDC permission</strong><br>
+            GitHub will not mint an identity token unless you declare:
+            <pre style="margin:5px 0;"><code>permissions:
+  id-token: write
+  contents: read</code></pre>
+        </div>
+
+        <div class="warning-box">
+            <strong>Rule 2: Use <code>role-to-assume</code> inside `with:`</strong><br>
+            Instead of <code>aws-access-key-id</code>, pass:
+            <pre style="margin:5px 0;"><code>uses: aws-actions/configure-aws-credentials@v4
+with:
+  role-to-assume: arn:aws:iam::194722438900:role/GitHubActions-S3-DeployRole
+  aws-region: ap-south-1</code></pre>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>4. The Complete Master Week 3 OIDC YAML Workflow</h2>
+        <div class="code-container">
+<span class="yml-key">name:</span> <span class="yml-value">Deploy Backend to AWS S3 via OIDC</span>
+
+<span class="yml-key">on:</span>
+  <span class="yml-key">push:</span>
+    <span class="yml-key">branches:</span>
+      <span class="yml-value">- main</span>
+  <span class="yml-key">workflow_dispatch:</span>
+
+<span class="yml-comment"># 🔑 Mandatory permission for GitHub to mint OIDC tokens</span>
+<span class="yml-key">permissions:</span>
+  <span class="yml-key">id-token:</span> <span class="yml-value">write</span>
+  <span class="yml-key">contents:</span> <span class="yml-value">read</span>
+
+<span class="yml-key">jobs:</span>
+  <span class="yml-key">build_and_deploy:</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Checkout repository</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/checkout@v4</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Setup Node.js</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/setup-node@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">node-version:</span> <span class="yml-value">'20'</span>
+          <span class="yml-key">cache:</span> <span class="yml-value">'npm'</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Install dependencies</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm ci</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Run tests (Quality Gate)</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm test</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Package backend into zip</span>
+        <span class="yml-key">run:</span> <span class="yml-value">zip -r backend.zip . -x "*.git*"</span>
+
+      <span class="yml-comment"># 🛡️ Authenticate to AWS via OIDC Role (Keyless!)</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Configure AWS Credentials using OIDC</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">aws-actions/configure-aws-credentials@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">role-to-assume:</span> <span class="yml-value">arn:aws:iam::194722438900:role/GitHubActions-S3-DeployRole</span>
+          <span class="yml-key">aws-region:</span> <span class="yml-value">ap-south-1</span>
+
+      <span class="yml-comment"># 🚀 Upload to Amazon S3 Bucket</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Upload package to S3</span>
+        <span class="yml-key">run:</span> <span class="yml-value">aws s3 cp backend.zip s3://sanjit-backend-deployments-2026/</span>
+        </div>
+    </div>
+
+</body>
+</html>

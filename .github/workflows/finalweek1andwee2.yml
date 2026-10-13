@@ -1,0 +1,28 @@
+name: matrix_ci
+on:
+  push:
+
+jobs:
+  test_matrix:
+    runs-on: ubuntu-latest
+    
+    strategy:
+     matrix:
+      node_version: [18,20,22]
+
+    steps: 
+      - name : checkout the code 
+        uses: actions/checkout@v4
+
+      - name : step up node dynamix 
+        uses: actions/setup-node@v4
+        with:
+         node_version: ${{matrix.node_version}}
+         cache: 'npm'
+
+      - name : install the dependency 
+        run : npm ci 
+
+      - name : run the test 
+        run: npm test 
+     

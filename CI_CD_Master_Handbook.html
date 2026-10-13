@@ -360,6 +360,255 @@
           <span class="yml-value">echo "Tests passed! Packaging the clinic app..."</span>
           <span class="yml-keyword">docker</span> <span class="yml-value">build -t dental-clinic-backend .</span>
         </div>
+
+    <div class="card">
+        <h2 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 8px;">
+            🎓 The 100% Master Revision: Week 1 & 2 Final Blueprint
+        </h2>
+        <p>This is the battle-tested, 3-job production-ready pipeline you perfected. It demonstrates every single concept from Weeks 1 and 2: Matrix builds, Caching, Multi-Job dependencies (<code>needs:</code>), Artifact upload/download, Quality Gates, and GitHub Secrets.</p>
+
+        <div class="pro-tip">
+            <strong>Key Architecture in this Pipeline:</strong>
+            <ul>
+                <li><strong>Job 1 (<code>testmatrix</code>):</strong> Runs in parallel across Node 18 & 20, uses <code>cache: 'npm'</code>, installs via <code>npm ci</code>, and runs tests.</li>
+                <li><strong>Job 2 (<code>build_and_package</code>):</strong> Waits for tests, zips clean project code (excluding <code>.git*</code>), and uploads to GitHub's artifact vault.</li>
+                <li><strong>Job 3 (<code>deploy_staging</code>):</strong> Waits for build, downloads the package from the vault, and safely accesses secret tokens.</li>
+            </ul>
+        </div>
+
+        <div class="code-block">
+<span class="yml-key">name:</span> <span class="yml-value">complete revision</span>
+
+<span class="yml-key">on:</span>
+  <span class="yml-key">push:</span> 
+    <span class="yml-key">branches:</span>
+      <span class="yml-value">- main</span>
+  <span class="yml-key">workflow_dispatch:</span>
+
+<span class="yml-key">jobs:</span>
+  <span class="yml-comment"># JOB 1: Test across versions with caching (Week 1 + Week 2)</span>
+  <span class="yml-key">testmatrix:</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">strategy:</span>
+      <span class="yml-key">matrix:</span>
+        <span class="yml-key">node_version:</span> <span class="yml-value">[18, 20]</span>
+
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">checkout the code</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/checkout@v4</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">setup node js</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/setup-node@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">node-version:</span> <span class="yml-value">${{ matrix.node_version }}</span>
+          <span class="yml-key">cache:</span> <span class="yml-value">'npm'</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">install the dependency</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm ci</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">run the test</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm test</span>
+
+  <span class="yml-comment"># JOB 2: Packaging & Artifact Upload (Week 2)</span>
+  <span class="yml-key">build_and_package:</span>
+    <span class="yml-key">needs:</span> <span class="yml-value">testmatrix</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">checkout the code</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/checkout@v4</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">zip the code</span>
+        <span class="yml-key">run:</span> <span class="yml-value">zip -r backend.zip . -x "*.git*"</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">upload the zip file</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/upload-artifact@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">name:</span> <span class="yml-value">app-package</span>
+          <span class="yml-key">path:</span> <span class="yml-value">backend.zip</span>
+
+  <span class="yml-comment"># JOB 3: Download & Secret Injection (Week 1 + Week 2)</span>
+  <span class="yml-key">deploy_staging:</span>
+    <span class="yml-key">needs:</span> <span class="yml-value">build_and_package</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">env:</span>
+      <span class="yml-key">APP_ENV:</span> <span class="yml-value">'staging'</span>
+
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">download the zip file</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/download-artifact@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">name:</span> <span class="yml-value">app-package</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">secret key use</span>
+        <span class="yml-key">env:</span> 
+          <span class="yml-key">DEPLOY_KEY:</span> <span class="yml-value">${{ secrets.API_SECRET }}</span>
+        <span class="yml-key">run:</span> |
+          <span class="yml-value">echo "Deploying package with key: $DEPLOY_KEY"</span>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 8px;">
+            ⚠️ The "Never Forget" Bug Checklist
+        </h2>
+        <p>Review this table whenever you debug or write workflows under exam/interview conditions:</p>
+
+        <table>
+            <tr>
+                <th>Mistake / Pitfall</th>
+                <th>Why it Crashes</th>
+                <th>The Correct Pattern</th>
+            </tr>
+            <tr>
+                <td><strong>Mixing <code>uses:</code> and <code>run:</code></strong></td>
+                <td>GitHub parser rejects a step doing two contradictory things.</td>
+                <td>Separate into two distinct steps with their own dashes (<code>-</code>).</td>
+            </tr>
+            <tr>
+                <td><strong>Missing <code>path:</code> in upload</strong></td>
+                <td>GitHub creates a blank artifact because it doesn't know what file to save.</td>
+                <td>Always pair <code>name:</code> with <code>path: your-file.zip</code>.</td>
+            </tr>
+            <tr>
+                <td><strong>Mismatched Secret Mapping</strong></td>
+                <td><code>echo $KEY</code> prints blank because the variable wasn't assigned to that name.</td>
+                <td><code>env: LOCAL_VAR: ${{ secrets.GITHUB_SECRET }}</code> ➔ use <code>$LOCAL_VAR</code>.</td>
+            </tr>
+            <tr>
+                <td><strong><code>node_version</code> vs <code>node-version</code></strong></td>
+                <td>GitHub's official setup-node ignores underscore inputs silently.</td>
+                <td>Always use hyphen: <code>node-version: '20'</code>.</td>
+            </tr>
+            <tr>
+                <td><strong>Infinite loops (<code>npm start</code>)</strong></td>
+                <td>Leaves terminal open forever; times out and consumes paid compute minutes.</td>
+                <td>Always use terminating scripts: <code>npm test</code>, <code>npm ci</code>.</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="card">
+        <h2 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 8px;">
+            ☁️ Week 3: Cloud Deployment to AWS with OIDC (Keyless Authentication)
+        </h2>
+        <div class="deep-dive">
+            <strong>The Industry Standard:</strong> In modern DevOps, we avoid long-lived secret keys (<code>AWS_ACCESS_KEY_ID</code> / <code>AWS_SECRET_ACCESS_KEY</code>) because if stolen, they expose the whole AWS account. Instead, we use <strong>OpenID Connect (OIDC)</strong> to let GitHub exchange a cryptographic token for temporary 15–60 minute AWS credentials.
+        </div>
+
+        <h3>1. Long-Lived Access Keys vs. OIDC (Why OIDC Wins)</h3>
+        <table>
+            <tr>
+                <th>Feature</th>
+                <th>❌ Static Access Keys (Old Way)</th>
+                <th>🏆 OIDC with IAM Role (Modern Best Practice)</th>
+            </tr>
+            <tr>
+                <td><strong>Secrets in GitHub</strong></td>
+                <td>Stores permanent credentials</td>
+                <td><strong>Zero permanent keys stored!</strong> 🚫🔑</td>
+            </tr>
+            <tr>
+                <td><strong>Credential Expiry</strong></td>
+                <td>Never expires until manually rotated</td>
+                <td>Temporary STS badge expires in 15–60 minutes</td>
+            </tr>
+            <tr>
+                <td><strong>Security Risk</strong></td>
+                <td>Critical if keys leak in logs/repos</td>
+                <td>Zero leak risk — no static secrets exist</td>
+            </tr>
+            <tr>
+                <td><strong>Permissions Scope</strong></td>
+                <td>Broad user-level permissions</td>
+                <td>Locked down to specific repo (<code>SanjitKyle/ci_cd</code>) & branch (<code>main</code>)</td>
+            </tr>
+        </table>
+
+        <h3>2. What We Configured in the AWS Console (Step-by-Step)</h3>
+        <div class="real-world">
+            <strong>Phase 1: Added OpenID Connect Identity Provider (IAM)</strong>
+            <ul>
+                <li><strong>Provider Type:</strong> OpenID Connect</li>
+                <li><strong>Provider URL:</strong> <code>https://token.actions.githubusercontent.com</code> (clicked <em>Get thumbprint</em>)</li>
+                <li><strong>Audience:</strong> <code>sts.amazonaws.com</code></li>
+                <li><strong>Result:</strong> AWS established mutual trust with GitHub Actions.</li>
+            </ul>
+        </div>
+
+        <div class="pro-tip">
+            <strong>Phase 2: Created IAM Role (<code>GitHubActions-S3-DeployRole</code>)</strong>
+            <ul>
+                <li><strong>Trusted Entity:</strong> Web Identity (using <code>token.actions.githubusercontent.com</code> & <code>sts.amazonaws.com</code>)</li>
+                <li><strong>Repository Restriction:</strong> Bound to organization/user <code>SanjitKyle</code>, repository <code>ci_cd</code>, branch <code>main</code></li>
+                <li><strong>Permissions Policy:</strong> Attached <code>AmazonS3FullAccess</code> (allows uploading packages to S3)</li>
+                <li><strong>Role ARN:</strong> e.g., <code>arn:aws:iam::194722438900:role/GitHubActions-S3-DeployRole</code></li>
+            </ul>
+        </div>
+
+        <div class="deep-dive">
+            <strong>Phase 3: S3 Bucket Setup (Storage Destination)</strong>
+            <ul>
+                <li>Created globally unique S3 bucket (e.g. <code>sanjit-backend-deployments-2026</code>)</li>
+                <li>Region selected (e.g., <code>ap-south-1</code> Mumbai or <code>us-east-1</code> N. Virginia)</li>
+                <li>Kept Block Public Access ON (secure storage)</li>
+            </ul>
+        </div>
+
+        <h3>3. Crucial Workflow Requirements for OIDC</h3>
+        <ul>
+            <li><strong>Required Permission:</strong> You <em>must</em> specify <code>permissions: id-token: write</code>. Without this, GitHub cannot request the OIDC token!</li>
+            <li><strong>Role Parameter:</strong> Use <code>role-to-assume: &lt;YOUR_ROLE_ARN&gt;</code> instead of access key secrets.</li>
+        </ul>
+
+        <h3>4. Production OIDC Deployment Workflow Template</h3>
+        <div class="code-block">
+<span class="yml-key">name:</span> <span class="yml-value">Deploy Backend to AWS S3 via OIDC</span>
+
+<span class="yml-key">on:</span>
+  <span class="yml-key">push:</span>
+    <span class="yml-key">branches:</span>
+      <span class="yml-value">- main</span>
+  <span class="yml-key">workflow_dispatch:</span>
+
+<span class="yml-comment"># 🔑 CRITICAL: Grants GitHub permission to mint an OIDC token</span>
+<span class="yml-key">permissions:</span>
+  <span class="yml-key">id-token:</span> <span class="yml-value">write</span>
+  <span class="yml-key">contents:</span> <span class="yml-value">read</span>
+
+<span class="yml-key">jobs:</span>
+  <span class="yml-key">build_and_deploy:</span>
+    <span class="yml-key">runs-on:</span> <span class="yml-value">ubuntu-latest</span>
+    <span class="yml-key">steps:</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Checkout repository</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/checkout@v4</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Setup Node.js</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">actions/setup-node@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">node-version:</span> <span class="yml-value">'20'</span>
+          <span class="yml-key">cache:</span> <span class="yml-value">'npm'</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Install dependencies</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm ci</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Run tests (Quality Gate)</span>
+        <span class="yml-key">run:</span> <span class="yml-value">npm test</span>
+
+      <span class="yml-key">- name:</span> <span class="yml-value">Package backend into zip</span>
+        <span class="yml-key">run:</span> <span class="yml-value">zip -r backend.zip . -x "*.git*"</span>
+
+      <span class="yml-comment"># 🛡️ Authenticate via OIDC Role (Keyless!)</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Configure AWS Credentials using OIDC</span>
+        <span class="yml-key">uses:</span> <span class="yml-value">aws-actions/configure-aws-credentials@v4</span>
+        <span class="yml-key">with:</span>
+          <span class="yml-key">role-to-assume:</span> <span class="yml-value">arn:aws:iam::194722438900:role/GitHubActions-S3-DeployRole</span>
+          <span class="yml-key">aws-region:</span> <span class="yml-value">ap-south-1</span>
+
+      <span class="yml-comment"># 🚀 Upload artifact straight to S3 cloud storage</span>
+      <span class="yml-key">- name:</span> <span class="yml-value">Upload package to S3 Bucket</span>
+        <span class="yml-key">run:</span> <span class="yml-value">aws s3 cp backend.zip s3://sanjit-backend-deployments-2026/</span>
+        </div>
     </div>
 
 </div>
