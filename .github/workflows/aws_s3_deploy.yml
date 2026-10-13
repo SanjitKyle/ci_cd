@@ -44,5 +44,5 @@ jobs:
       # 🚀 Upload package directly to your AWS S3 Bucket
       - name: Upload backend.zip to Amazon S3
         run: |
-          aws s3 cp backend.zip s3://YOUR_BUCKET_NAME_HERE/
+          aws s3 cp backend.zip s3://sanjit-backend-builds/
           echo "Successfully uploaded backend.zip to AWS S3! 🚀"
